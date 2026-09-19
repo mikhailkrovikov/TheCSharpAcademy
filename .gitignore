@@ -8,3 +8,9 @@
 /MathGame/MathGame.slnx
 /MathGame/obj
 /MathGame/bin/Debug/net10.0
+/Calculator/obj
+/Calculator/.vs
+/CalculatorLibrary/.vs/CalculatorLibrary.slnx
+/Calculator/bin/Debug/net10.0
+/CalculatorLibrary/bin/Debug/net10.0
+/CalculatorLibrary/obj
