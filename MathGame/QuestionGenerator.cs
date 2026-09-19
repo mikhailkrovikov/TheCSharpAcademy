@@ -25,6 +25,7 @@ public static class QuestionGenerator
         return (firstNumber, secondNumber);
     }
 
+
     private static int GetDivisor(int number)
     {
         var divisor = random.Next(1, number + 1);

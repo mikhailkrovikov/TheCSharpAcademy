@@ -14,9 +14,10 @@ public class ConsoleUIActions : IUIActions
         Console.WriteLine($"Correct! Score is {score}. Enter next operation");
     }
 
-    public void ShowFinalScore(int score)
+    public void ShowFinalScore(int score, long elappsedMilliseconds)
     {
         Console.WriteLine($"Your score is: {score}\n" +
+                          $"Time is: {elappsedMilliseconds / 1000} sec\n" +
                           $"To see score print S\n" +
                           $"To start new game, press any key...");
     }

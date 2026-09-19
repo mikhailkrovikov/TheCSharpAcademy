@@ -1,20 +1,25 @@
-﻿namespace MathGame;
+﻿using System.Diagnostics;
+
+namespace MathGame;
 
 public class MathGame
 {
     private readonly IUIActions actions;
+    private readonly Stopwatch stopwatch;
     private static readonly List<int> scoreHistory = new();
     private const int NumberOfQuestions = 5;
 
     public MathGame(IUIActions actions)
     {
         this.actions = actions;
+        stopwatch = new();
     }
 
     public int StartGame()
     {
         var score = 0;
         actions.ShowWelcomeMessage();
+        stopwatch.Start();
         for (int i = 0; i < NumberOfQuestions; i++)
         {
             var operation = actions.ReadInput();
@@ -41,8 +46,10 @@ public class MathGame
                 actions.ShowIncorrectAnswerMessage(expected, score);
             }
         }
+        stopwatch.Stop();
         scoreHistory.Add(score);
-        actions.ShowFinalScore(score);
+        actions.ShowFinalScore(score, stopwatch.ElapsedMilliseconds);
+        stopwatch.Reset();
         return score;
     }
 
