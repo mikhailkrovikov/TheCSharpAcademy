@@ -3,6 +3,12 @@
 public static class QuestionGenerator
 {
     private static readonly Random random = new();
+
+    /// <summary>
+    /// Tuple needs for correct handle of random numbers in case of operations of substraction and division
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <returns></returns>
     public static (int FirstNumber, int SecondNumber) GenerateNumbers(string operation)
     {
         var firstNumber = random.Next(0, 100);
