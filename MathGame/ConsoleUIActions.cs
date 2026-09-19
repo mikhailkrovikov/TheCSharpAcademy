@@ -14,7 +14,6 @@ public class ConsoleUIActions : IUIActions
         Console.WriteLine($"Correct! Score is {score}. Enter next operation");
     }
 
-
     public void ShowFinalScore(int score)
     {
         Console.WriteLine($"Your score is: {score}\n" +

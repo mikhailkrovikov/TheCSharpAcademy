@@ -38,9 +38,9 @@ public static class QuestionGenerator
     public static bool IsOperationValid(string operation)
     {
         return
-            operation == "+" || 
-            operation == "-" || 
-            operation == "*" || 
+            operation == "+" ||
+            operation == "-" ||
+            operation == "*" ||
             operation == "/";
     }
 }
