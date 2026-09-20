@@ -21,24 +21,30 @@ public class Program
             try
             {
                 var action = GetUserAction();
-                if (action == UserAction.Read)
+
+                if (action == UserAction.Create)
+                {
+                    var record = GetRecordFromUser();
+                    dataprovider.Create(record);
+                }
+                else if (action == UserAction.Read)
                 {
                     foreach (var item in dataprovider.ReadAllData())
                     {
                         Console.WriteLine(item);
                     }
                 }
-                else if (action == UserAction.Create)
+                else if (action == UserAction.Update)
                 {
+                    var input = GetIntInput();
                     var record = GetRecordFromUser();
-                    dataprovider.Create(record);
+                    dataprovider.Update(input, record);
                 }
                 else if (action == UserAction.Delete)
                 {
-                    Console.WriteLine("Enter id of removing record");
-                    var input = Convert.ToInt32(Console.ReadLine());
+
+                    var input = GetIntInput();
                     dataprovider.Delete(input);
-                    Console.WriteLine("Record is removed");
                 }
                 else if (action == UserAction.Exit)
                 {
@@ -51,9 +57,7 @@ public class Program
                 Console.ReadKey();
                 GoToMainMenu();
             }
-
         }
-
     }
 
     private static void GoToMainMenu()
@@ -62,6 +66,7 @@ public class Program
         Console.WriteLine("Choose action:");
         Console.WriteLine("Type C to create new record");
         Console.WriteLine("Type R to read all the records");
+        Console.WriteLine("Type U to update record");
         Console.WriteLine("Type D to delete record");
         Console.WriteLine("Type E to exit the application");
     }
@@ -76,13 +81,18 @@ public class Program
     private static UserAction GetUserAction()
     {
         var choice = Console.ReadLine();
-        if (choice == "R")
+
+        if (choice == "C")
+        {
+            return UserAction.Create;
+        }
+        else if (choice == "R")
         {
             return UserAction.Read;
         }
-        else if (choice == "C")
+        else if (choice == "U")
         {
-            return UserAction.Create;
+            return UserAction.Update;
         }
         else if (choice == "D")
         {

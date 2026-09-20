@@ -25,6 +25,20 @@ namespace Habit.Tracker
             }
         }
 
+
+
+        public void Create(Record record)
+        {
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = $"INSERT INTO fetching(DateTime, Count) VALUES('{record.DateTime.ToString("dd-MM-yy")}', {record.Count})";
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+
         public List<string> ReadAllData()
         {
             var data = new List<string>();
@@ -60,13 +74,13 @@ namespace Habit.Tracker
             return data;
         }
 
-        public void Create(Record habit)
+        public void Update(int id, Record record)
         {
             using (var connection = new SqliteConnection(connectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = $"INSERT INTO fetching(DateTime, Count) VALUES('{habit.DateTime.ToString("dd-MM-yy")}', {habit.Count})";
+                command.CommandText = $"UPDATE fetching SET DateTime='{record.DateTime.ToString("dd-MM-yy")}', Count={record.Count} WHERE Id={id}";
                 command.ExecuteNonQuery();
                 connection.Close();
             }
