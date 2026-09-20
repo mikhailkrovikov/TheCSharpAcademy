@@ -1,6 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
-
-namespace Habit.Tracker;
+﻿namespace Habit.Tracker;
 
 public enum UserAction
 {
@@ -16,8 +14,8 @@ public class Program
     public static void Main()
     {
         GoToMainMenu();
-        var exit = false;
-        DataProvider.CreateDatabase();
+        var dataprovider = new DataProvider();
+        dataprovider.CreateDatabase();
         while (true)
         {
             try
@@ -25,7 +23,7 @@ public class Program
                 var action = GetUserAction();
                 if (action == UserAction.Read)
                 {
-                    foreach (var item in DataProvider.GetAllData())
+                    foreach (var item in dataprovider.ReadAllData())
                     {
                         Console.WriteLine(item);
                     }
@@ -33,7 +31,18 @@ public class Program
                 else if (action == UserAction.Create)
                 {
                     var record = GetRecordFromUser();
-                    DataProvider.AddDate(record);
+                    dataprovider.Create(record);
+                }
+                else if (action == UserAction.Delete)
+                {
+                    Console.WriteLine("Enter id of removing record");
+                    var input = Convert.ToInt32(Console.ReadLine());
+                    dataprovider.Delete(input);
+                    Console.WriteLine("Record is removed");
+                }
+                else if (action == UserAction.Exit)
+                {
+                    break;
                 }
             }
             catch (ArgumentException ex)
@@ -42,7 +51,7 @@ public class Program
                 Console.ReadKey();
                 GoToMainMenu();
             }
-            
+
         }
 
     }
@@ -51,9 +60,17 @@ public class Program
     {
         Console.WriteLine("\nMAIN MENU");
         Console.WriteLine("Choose action:");
-        Console.WriteLine("Type R to read all the records");
         Console.WriteLine("Type C to create new record");
+        Console.WriteLine("Type R to read all the records");
+        Console.WriteLine("Type D to delete record");
         Console.WriteLine("Type E to exit the application");
+    }
+
+    private static int GetIntInput()
+    {
+        Console.WriteLine("Enter id of removing record");
+        var input = Convert.ToInt32(Console.ReadLine());
+        return input;
     }
 
     private static UserAction GetUserAction()
@@ -66,6 +83,14 @@ public class Program
         else if (choice == "C")
         {
             return UserAction.Create;
+        }
+        else if (choice == "D")
+        {
+            return UserAction.Delete;
+        }
+        else if (choice == "E")
+        {
+            return UserAction.Exit;
         }
         throw new ArgumentException("Invalid command");
     }
@@ -86,7 +111,7 @@ public class Program
         {
             throw new ArgumentException("Invalid count input");
         }
-        return new Record 
+        return new Record
         {
             DateTime = dateTime,
             Count = count

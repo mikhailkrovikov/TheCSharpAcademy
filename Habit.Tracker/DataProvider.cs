@@ -3,11 +3,11 @@ using System.Globalization;
 
 namespace Habit.Tracker
 {
-    public static class DataProvider
+    public class DataProvider
     {
-        private static string connectionString = "DataSource=fetching_tracker.db";
+        private readonly string connectionString = "DataSource=fetching_tracker.db";
 
-        public static void CreateDatabase()
+        public void CreateDatabase()
         {
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -25,7 +25,7 @@ namespace Habit.Tracker
             }
         }
 
-        public static List<string> GetAllData()
+        public List<string> ReadAllData()
         {
             var data = new List<string>();
             using (var connection = new SqliteConnection(connectionString))
@@ -60,7 +60,7 @@ namespace Habit.Tracker
             return data;
         }
 
-        public static void AddDate(Record habit)
+        public void Create(Record habit)
         {
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -72,5 +72,16 @@ namespace Habit.Tracker
             }
         }
 
+        public void Delete(int id)
+        {
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = $"DELETE FROM fetching WHERE Id = {id}";
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
     }
 }
