@@ -8,7 +8,7 @@
 
         public override string ToString()
         {
-            return $"{Id}: {DateTime} {Count}";
+            return $"{Id}: {DateTime:hh-MM-yy} {Count}";
         }
     }
 }
