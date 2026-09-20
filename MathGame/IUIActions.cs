@@ -2,7 +2,7 @@
 
 public interface IUIActions
 {
-    void ShowScoreHistory(IEnumerable<int> scoreHistory);
+    void ShowScoreHistory(List<int> scoreHistory);
     void ShowWelcomeMessage();
     void ShowQuestion(int firstNumber, int secondNumber, string operation);
     void ShowCorrectAnswerMessage(int score);
@@ -11,4 +11,5 @@ public interface IUIActions
     void ShowInvalidOperationMessage();
     string? ReadInput();
     void ClearScreen();
+    Choice MakeChoise();
 }

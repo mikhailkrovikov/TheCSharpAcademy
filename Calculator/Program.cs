@@ -74,7 +74,7 @@ namespace CalculatorProgram
                         numInput1 = Console.ReadLine();
                     }
                 }
-
+                //
                 // Ask the user to choose an operator.
                 Console.WriteLine("Choose an operator from the following list:");
                 Console.WriteLine("\ta - Add");

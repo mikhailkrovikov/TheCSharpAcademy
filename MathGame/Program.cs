@@ -9,10 +9,14 @@ public static class Program
         var game = new MathGame(consoleUi);
         while (true)
         {
-            game.StartGame();
-            if (consoleUi.ReadInput() == "S")
+            var choice = consoleUi.MakeChoise();
+            if (choice == Choice.Score)
             {
                 game.ShowScoreHistory();
+            }
+            if (choice == Choice.Game)
+            {
+                game.StartGame();
             }
             consoleUi.ClearScreen();
         }
