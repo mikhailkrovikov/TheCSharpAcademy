@@ -7,48 +7,42 @@ namespace Habit.Tracker
     {
         private readonly string connectionString = "DataSource=fetching_tracker.db";
 
+        private void ExecuteCommand(Action<SqliteCommand> action)
+        {
+            using var connection = new SqliteConnection(connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            action(command);
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+
         public void CreateDatabase()
         {
-            using (var connection = new SqliteConnection(connectionString))
+            ExecuteCommand(c =>
             {
-                connection.Open();
-                var table = connection.CreateCommand();
-                table.CommandText =
+                c.CommandText =
                     @"CREATE TABLE IF NOT EXISTS fetching 
                     (
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         DateTime Data,
                         Count INTEGER
                     )";
-                table.ExecuteNonQuery();
-                connection.Close();
-            }
+            });
         }
-
-
 
         public void Create(Record record)
         {
-            using (var connection = new SqliteConnection(connectionString))
-            {
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = $"INSERT INTO fetching(DateTime, Count) VALUES('{record.DateTime.ToString("dd-MM-yy")}', {record.Count})";
-                command.ExecuteNonQuery();
-                connection.Close();
-            }
+            ExecuteCommand(c => c.CommandText = $"INSERT INTO fetching(DateTime, Count) VALUES('{record.DateTime:dd-MM-yy}', {record.Count})");
         }
 
         public List<string> ReadAllData()
         {
             var data = new List<string>();
-            using (var connection = new SqliteConnection(connectionString))
+            ExecuteCommand(c =>
             {
-
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT * FROM fetching";
-                var reader = command.ExecuteReader();
+                c.CommandText = "SELECT * FROM fetching";
+                var reader = c.ExecuteReader();
                 if (reader.HasRows)
                 {
                     while (reader.Read())
@@ -68,34 +62,18 @@ namespace Habit.Tracker
                     throw new ArgumentException("No records :(");
                 }
                 reader.Close();
-                command.ExecuteNonQuery();
-                connection.Close();
-            }
+            });
             return data;
         }
 
         public void Update(int id, Record record)
         {
-            using (var connection = new SqliteConnection(connectionString))
-            {
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = $"UPDATE fetching SET DateTime='{record.DateTime.ToString("dd-MM-yy")}', Count={record.Count} WHERE Id={id}";
-                command.ExecuteNonQuery();
-                connection.Close();
-            }
+            ExecuteCommand(c => c.CommandText = $"UPDATE fetching SET DateTime='{record.DateTime:dd-MM-yy}', Count={record.Count} WHERE Id={id}");
         }
 
         public void Delete(int id)
         {
-            using (var connection = new SqliteConnection(connectionString))
-            {
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = $"DELETE FROM fetching WHERE Id = {id}";
-                command.ExecuteNonQuery();
-                connection.Close();
-            }
+            ExecuteCommand(c => c.CommandText = $"DELETE FROM fetching WHERE Id = {id}");
         }
     }
 }
