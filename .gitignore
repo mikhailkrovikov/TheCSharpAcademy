@@ -19,3 +19,4 @@
 /Habit.Tracker/obj
 /Habit.Tracker/obj/Debug/net10.0/ref/Habit.Tracker.dll
 /Habit.Tracker/Properties
+*.user
