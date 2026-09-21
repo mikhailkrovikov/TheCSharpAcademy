@@ -3,45 +3,48 @@ using System.Globalization;
 
 namespace Habit.Tracker
 {
-    public class DataProvider
+
+    public class SQLiteDataProvider : IDataProvider<Record>
     {
         private readonly string connectionString = "DataSource=fetching_tracker.db";
+        private readonly string tableName = "fetching";
 
-        private void ExecuteCommand(Action<SqliteCommand> action)
+        private bool ExecuteCommand(Action<SqliteCommand> action)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();
             var command = connection.CreateCommand();
             action(command);
-            command.ExecuteNonQuery();
+            var commands = command.ExecuteNonQuery();
             connection.Close();
+            return commands > 0;
         }
 
-        public void CreateDatabase()
+        public bool CreateDatabase()
         {
-            ExecuteCommand(c =>
+            return ExecuteCommand(c =>
             {
                 c.CommandText =
-                    @"CREATE TABLE IF NOT EXISTS fetching 
-                    (
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        DateTime Data,
-                        Count INTEGER
-                    )";
+                   $@"CREATE TABLE IF NOT EXISTS {tableName} 
+                   (
+                       Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       DateTime Data,
+                       Count INTEGER
+                   )";
             });
         }
 
-        public void Create(Record record)
+        public bool Create(Record record)
         {
-            ExecuteCommand(c => c.CommandText = $"INSERT INTO fetching(DateTime, Count) VALUES('{record.DateTime:dd-MM-yy}', {record.Count})");
+            return ExecuteCommand(c => c.CommandText = $"INSERT INTO {tableName}(DateTime, Count) VALUES('{record.DateTime:dd-MM-yy}', {record.Count})");
         }
 
-        public List<string> ReadAllData()
+        public List<Record> ReadAllData()
         {
-            var data = new List<string>();
+            var data = new List<Record>();
             ExecuteCommand(c =>
             {
-                c.CommandText = "SELECT * FROM fetching";
+                c.CommandText = $"SELECT * FROM {tableName}";
                 var reader = c.ExecuteReader();
                 if (reader.HasRows)
                 {
@@ -53,7 +56,7 @@ namespace Habit.Tracker
                             DateTime = DateTime.ParseExact(reader.GetString(1), "dd-MM-yy", new CultureInfo("en-US")),
                             Count = reader.GetInt32(2)
                         };
-                        data.Add(record.ToString());
+                        data.Add(record);
                     }
                 }
                 else
@@ -66,14 +69,14 @@ namespace Habit.Tracker
             return data;
         }
 
-        public void Update(int id, Record record)
+        public bool Update(int id, Record record)
         {
-            ExecuteCommand(c => c.CommandText = $"UPDATE fetching SET DateTime='{record.DateTime:dd-MM-yy}', Count={record.Count} WHERE Id={id}");
+            return ExecuteCommand(c => c.CommandText = $"UPDATE {tableName} SET DateTime='{record.DateTime:dd-MM-yy}', Count={record.Count} WHERE Id={id}");
         }
 
-        public void Delete(int id)
+        public bool Delete(int id)
         {
-            ExecuteCommand(c => c.CommandText = $"DELETE FROM fetching WHERE Id = {id}");
+            return ExecuteCommand(c => c.CommandText = $"DELETE FROM {tableName} WHERE Id = {id}");
         }
     }
 }

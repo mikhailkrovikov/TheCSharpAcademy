@@ -4,10 +4,12 @@ public class Program
 {
     public static void Main()
     {
-        var dataprovider = new DataProvider();
+        var dataprovider = new SQLiteDataProvider();
         var consoleUI = new ConsoleUserInterface();
+
         dataprovider.CreateDatabase();
         consoleUI.GoToMainMenu();
+
         while (true)
         {
             try
@@ -17,24 +19,28 @@ public class Program
                 if (action == UserAction.Create)
                 {
                     var record = consoleUI.GetRecordFromUser();
-                    dataprovider.Create(record);
+                    var res = dataprovider.Create(record);
+                    consoleUI.PrintEndMessage(action, res);
+
                 }
                 else if (action == UserAction.Read)
                 {
                     var data = dataprovider.ReadAllData();
                     consoleUI.PrintData(data);
+                    consoleUI.PrintEndMessage(action, data.Count > 0);
                 }
                 else if (action == UserAction.Update)
                 {
                     var input = consoleUI.GetIdInput();
                     var record = consoleUI.GetRecordFromUser();
-                    dataprovider.Update(input, record);
+                    var res = dataprovider.Update(input, record);
+                    consoleUI.PrintEndMessage(action, res);
                 }
                 else if (action == UserAction.Delete)
                 {
-
                     var input = consoleUI.GetIdInput();
-                    dataprovider.Delete(input);
+                    var res = dataprovider.Delete(input);
+                    consoleUI.PrintEndMessage(action, res);
                 }
                 else if (action == UserAction.Exit)
                 {
@@ -48,6 +54,4 @@ public class Program
             }
         }
     }
-
-
 }

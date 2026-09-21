@@ -7,5 +7,5 @@ public interface IUserInterface
     int GetIdInput();
     void PrintError(string str);
     Record GetRecordFromUser();
-    void PrintData(List<string> list);
+    void PrintData(List<Record> list);
 }
