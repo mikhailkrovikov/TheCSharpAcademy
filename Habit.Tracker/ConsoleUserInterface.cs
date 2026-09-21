@@ -21,85 +21,84 @@ public class ConsoleUserInterface : IUserInterface
 
     public void PrintEndMessage(UserAction userAction, bool succes)
     {
-        if (userAction == UserAction.Create)
+        switch (userAction)
         {
-            if (succes)
-            {
-                Console.WriteLine("Record was succesfully added");
-                Console.WriteLine("Press next command to do");
-            }
-            else
-            {
-                Console.WriteLine("An error occures with add");
-                Console.WriteLine("Press next command to do");
-            }
+            case UserAction.Create:
+                if (succes)
+                {
+                    Console.WriteLine("Record was succesfully added");
+                    GoToMainMenu();
+                }
+                else
+                {
+                    Console.WriteLine("An error occures with add");
+                    GoToMainMenu();
+                }
+                break;
+            case UserAction.Read:
+                if (succes)
+                {
+                    GoToMainMenu();
+                }
+                else
+                {
+                    Console.WriteLine("An error occures with read");
+                    GoToMainMenu();
+                }
+                break;
+            case UserAction.Delete:
+                if (succes)
+                {
+                    Console.WriteLine("Record was succesfully deleted");
+                    GoToMainMenu();
+                }
+                else
+                {
+                    Console.WriteLine("An error occures with delete");
+                    GoToMainMenu();
+                }
+                break;
+            case UserAction.Update:
+                if (succes)
+                {
+                    Console.WriteLine("Record was succesfully updated");
+                    GoToMainMenu(); ;
+                }
+                else
+                {
+                    Console.WriteLine("An error occures with update"); 
+                    GoToMainMenu();
+                }
+                break;
+            default:
+                throw new ArgumentException($"Invalid action {userAction}");
         }
-        else if (userAction == UserAction.Read)
-        {
-            if (succes)
-            {
-                Console.WriteLine("Press next command to do\n");
-            }
-            else
-            {
-                Console.WriteLine("An error occures with read");
-                Console.WriteLine("Press next command to do");
-            }
-        }
-        else if (userAction == UserAction.Delete)
-        {
-            if (succes)
-            {
-                Console.WriteLine("Record was succesfully deleted");
-                Console.WriteLine("Press next command to do\n");
-            }
-            else
-            {
-                Console.WriteLine("An error occures with delete");
-                Console.WriteLine("Press next command to do");
-            }
-        }
-        else if (userAction == UserAction.Update)
-        {
-            if (succes)
-            {
-                Console.WriteLine("Record was succesfully updated");
-                Console.WriteLine("Press next command to do\n");
-            }
-            else
-            {
-                Console.WriteLine("An error occures with update");
-                Console.WriteLine("Press next command to do");
-            }
-        }
-        else throw new ArgumentException($"Invalid action {userAction}");
     }
 
     public UserAction GetUserAction()
     {
         var choice = Console.ReadLine();
 
-        if (choice == "C")
+        switch (choice)
         {
-            return UserAction.Create;
+            case "C":
+            case "c":
+                return UserAction.Create;
+            case "R":
+            case "r":
+                return UserAction.Read;
+            case "U":
+            case "u":
+                return UserAction.Update;
+            case "D":
+            case "d":
+                return UserAction.Delete;
+            case "E":
+            case "e":
+                return UserAction.Exit;
+            default:
+                throw new ArgumentException("Invalid command");
         }
-        else if (choice == "R")
-        {
-            return UserAction.Read;
-        }
-        else if (choice == "U")
-        {
-            return UserAction.Update;
-        }
-        else if (choice == "D")
-        {
-            return UserAction.Delete;
-        }
-        else if (choice == "E")
-        {
-            return UserAction.Exit;
-        }
-        else throw new ArgumentException("Invalid command");
     }
 
     public int GetIdInput()

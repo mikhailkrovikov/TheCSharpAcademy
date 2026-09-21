@@ -8,4 +8,5 @@ public interface IUserInterface
     void PrintError(string str);
     Record GetRecordFromUser();
     void PrintData(List<Record> list);
+    void PrintEndMessage(UserAction userAction, bool succes);
 }

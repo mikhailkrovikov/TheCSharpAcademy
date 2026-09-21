@@ -15,37 +15,48 @@ public class Program
             try
             {
                 var action = consoleUI.GetUserAction();
+                var result = false;
+                switch (action)
+                {
+                    case UserAction.Create:
+                        {
+                            var record = consoleUI.GetRecordFromUser();
+                            result = dataprovider.Create(record);
+                            break;
+                        }
 
-                if (action == UserAction.Create)
-                {
-                    var record = consoleUI.GetRecordFromUser();
-                    var res = dataprovider.Create(record);
-                    consoleUI.PrintEndMessage(action, res);
+                    case UserAction.Read:
+                        {
+                            var data = dataprovider.ReadAllData();
+                            consoleUI.PrintData(data);
+                            result = data.Count > 0;
+                            break;
+                        }
 
+                    case UserAction.Update:
+                        {
+                            var data = dataprovider.ReadAllData();
+                            consoleUI.PrintData(data);
+                            var input = consoleUI.GetIdInput();
+                            var record = consoleUI.GetRecordFromUser();
+                            result = dataprovider.Update(input, record);
+                            break;
+                        }
+
+                    case UserAction.Delete:
+                        {
+                            var data = dataprovider.ReadAllData();
+                            consoleUI.PrintData(data);
+                            var input = consoleUI.GetIdInput();
+                            result = dataprovider.Delete(input);
+                            break;
+                        }
                 }
-                else if (action == UserAction.Read)
-                {
-                    var data = dataprovider.ReadAllData();
-                    consoleUI.PrintData(data);
-                    consoleUI.PrintEndMessage(action, data.Count > 0);
-                }
-                else if (action == UserAction.Update)
-                {
-                    var input = consoleUI.GetIdInput();
-                    var record = consoleUI.GetRecordFromUser();
-                    var res = dataprovider.Update(input, record);
-                    consoleUI.PrintEndMessage(action, res);
-                }
-                else if (action == UserAction.Delete)
-                {
-                    var input = consoleUI.GetIdInput();
-                    var res = dataprovider.Delete(input);
-                    consoleUI.PrintEndMessage(action, res);
-                }
-                else if (action == UserAction.Exit)
+                if (action == UserAction.Exit)
                 {
                     break;
                 }
+                consoleUI.PrintEndMessage(action, result);
             }
             catch (ArgumentException ex)
             {
