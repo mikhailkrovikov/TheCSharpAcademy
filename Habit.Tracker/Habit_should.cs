@@ -125,7 +125,7 @@ namespace Habit.Tracker
         private static void DeleteDatabaseFile()
         {
             SqliteConnection.ClearAllPools();
-            File.Delete("fetching_tracker.db");
+            File.Delete("fencing_tracker.db");
         }
     }
 }

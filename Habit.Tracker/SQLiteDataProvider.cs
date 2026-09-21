@@ -6,8 +6,8 @@ namespace Habit.Tracker
 
     public class SQLiteDataProvider : IDataProvider<Record>
     {
-        private readonly string connectionString = "DataSource=fetching_tracker.db";
-        private readonly string tableName = "fetching";
+        private readonly string connectionString = "DataSource=fencing_tracker.db";
+        private readonly string tableName = "fencing";
 
         private bool ExecuteCommand(Action<SqliteCommand> action)
         {
