@@ -20,7 +20,7 @@ Developed using C# and SQLite.
 	- If no database exists, or the correct table does not exist they will be created on program start.
  	
 * CRUD DB functions
-	- "C" - creating a new record with date/time entered in mm-DD-yyyy format and count
+	- "C" - creating a new record with date/time entered in dd-mm-yy format and count
 	- "R" - reading all data
 	- "U" - update a record by Id, changing a time and count
 	- "D" - delete record by Id
