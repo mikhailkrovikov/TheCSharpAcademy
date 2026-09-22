@@ -119,7 +119,7 @@ public class ConsoleUserInterface : IUserInterface
 
     public Record GetRecordFromUser()
     {
-        Console.WriteLine("Enter date of record in dd-mm-yy format");
+        Console.WriteLine("Enter date of record in dd-MM-yy format");
         var inputDate = Console.ReadLine();
         var dateTime = GatValidDateTime(inputDate);
 
@@ -146,7 +146,7 @@ public class ConsoleUserInterface : IUserInterface
 
     private static DateTime GatValidDateTime(string? input)
     {
-        var validDate = DateTime.TryParseExact(input, "dd-mm-yy", new CultureInfo("en-US"), DateTimeStyles.None, out DateTime dateTime);
+        var validDate = DateTime.TryParseExact(input, "dd-MM-yy", new CultureInfo("en-US"), DateTimeStyles.None, out DateTime dateTime);
         if (!validDate)
         {
             throw new ArgumentException("Invalid input date");

@@ -36,7 +36,14 @@ namespace Habit.Tracker
 
         public bool Create(Record record)
         {
-            return ExecuteCommand(c => c.CommandText = $"INSERT INTO {tableName}(DateTime, Count) VALUES('{record.DateTime:dd-MM-yy}', {record.Count})");
+            return ExecuteCommand(c =>
+            {
+                var dateTimeParameter = new SqliteParameter("@dateTime", record.DateTime.ToString("dd-MM-yy"));
+                var countParameter = new SqliteParameter("@count", record.Count);
+                c.Parameters.Add(dateTimeParameter);
+                c.Parameters.Add(countParameter);
+                c.CommandText = $"INSERT INTO {tableName} (DateTime, Count) VALUES (@dateTime, @count)";
+            });
         }
 
         public List<Record> ReadAllData()
@@ -66,12 +73,24 @@ namespace Habit.Tracker
 
         public bool Update(int id, Record record)
         {
-            return ExecuteCommand(c => c.CommandText = $"UPDATE {tableName} SET DateTime='{record.DateTime:dd-MM-yy}', Count={record.Count} WHERE Id={id}");
+            return ExecuteCommand(c =>
+            {
+                var dateTimeParameter = new SqliteParameter("@dateTime", record.DateTime.ToString("dd-MM-yy"));
+                var countParameter = new SqliteParameter("@count", record.Count);
+                c.Parameters.AddWithValue("@id", id);
+                c.Parameters.Add(dateTimeParameter);
+                c.Parameters.Add(countParameter);
+                c.CommandText = $"UPDATE {tableName} SET DateTime=@dateTime, Count=@count WHERE Id=@id";
+            });
         }
 
         public bool Delete(int id)
         {
-            return ExecuteCommand(c => c.CommandText = $"DELETE FROM {tableName} WHERE Id = {id}");
+            return ExecuteCommand(c =>
+            {
+                c.Parameters.AddWithValue("@id", id);
+                c.CommandText = $"DELETE FROM {tableName} WHERE Id=@id";
+            }); 
         }
     }
 }

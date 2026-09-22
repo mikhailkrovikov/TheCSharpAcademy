@@ -9,9 +9,17 @@ public class Program
         var dataprovider = new SQLiteDataProvider();
         var consoleUI = new ConsoleUserInterface();
 
-        dataprovider.CreateDatabase();
-        consoleUI.GoToMainMenu();
 
+        consoleUI.GoToMainMenu();
+        try
+        {
+            dataprovider.CreateDatabase();
+        }
+        catch (SqliteException)
+        {
+            consoleUI.PrintError("Error occures with database");
+            consoleUI.GoToMainMenu();
+        }
         while (true)
         {
             try
