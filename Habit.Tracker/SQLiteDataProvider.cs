@@ -59,11 +59,6 @@ namespace Habit.Tracker
                         data.Add(record);
                     }
                 }
-                else
-                {
-                    reader.Close();
-                    throw new ArgumentException("No records :(");
-                }
                 reader.Close();
             });
             return data;

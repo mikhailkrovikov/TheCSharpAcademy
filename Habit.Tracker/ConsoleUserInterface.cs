@@ -1,4 +1,6 @@
-﻿namespace Habit.Tracker;
+﻿using System.Globalization;
+
+namespace Habit.Tracker;
 
 public class ConsoleUserInterface : IUserInterface
 {
@@ -42,7 +44,7 @@ public class ConsoleUserInterface : IUserInterface
                 }
                 else
                 {
-                    Console.WriteLine("An error occures with read");
+                    Console.WriteLine("No records yet");
                     GoToMainMenu();
                 }
                 break;
@@ -117,7 +119,7 @@ public class ConsoleUserInterface : IUserInterface
 
     public Record GetRecordFromUser()
     {
-        Console.WriteLine("Enter date of record");
+        Console.WriteLine("Enter date of record in dd-mm-yy format");
         var inputDate = Console.ReadLine();
         var dateTime = GatValidDateTime(inputDate);
 
@@ -144,7 +146,7 @@ public class ConsoleUserInterface : IUserInterface
 
     private static DateTime GatValidDateTime(string? input)
     {
-        var validDate = DateTime.TryParse(input, out DateTime dateTime);
+        var validDate = DateTime.TryParseExact(input, "dd-mm-yy", new CultureInfo("en-US"), DateTimeStyles.None, out DateTime dateTime);
         if (!validDate)
         {
             throw new ArgumentException("Invalid input date");
