@@ -10,24 +10,35 @@ namespace Coding.Tracker.Commands
 
         public override void Execute()
         {
-            var reader = new ViewDataCommand(service);
-            reader.ExecuteWithoutExit();
-            var id = ValidateNumeric(AnsiConsole.Ask<string>("Enter numeric [blue]id[/] of session for delete:"));
-            var session = service.ReadAllData().FirstOrDefault(s => s.Id == id);
-            if (session == null)
+            var data = service.ReadAllData();
+            if (data.Count == 0)
             {
-                SpectreConsoleUI.PrintMessage($"Session with {id} not found", "yellow");
-                Console.ReadKey();
+                SpectreConsoleUI.PrintMessage("No sessions to delete", "yellow");
+                Console.ReadKey(true);
+                return;
             }
-            else
+            var selected = SpectreConsoleUI.PrintChoices(data);
+            if (selected.Count == 0)
             {
-                if (!service.Delete(id))
+                SpectreConsoleUI.PrintMessage("Deletion cancelled", "yellow");
+                Console.ReadKey(true);
+                return;
+            }
+            var deletedCount = 0;
+
+            foreach (var id in selected)
+            {
+                if (service.Delete(id))
                 {
-                    throw new ArgumentException("Error occures when delete form database");
+                    deletedCount++;
                 }
-                SpectreConsoleUI.PrintMessage("Session was succesfully deleted. Press any key to return to Menu", "green");
-                Console.ReadKey();
+                else
+                {
+                    SpectreConsoleUI.PrintMessage($"Session with id {id} was not deleted", "yellow");
+                }
             }
+            SpectreConsoleUI.PrintMessage("Session was succesfully deleted. Press any key to return to Menu", "green");
+            Console.ReadKey(true);
         }
     }
 }

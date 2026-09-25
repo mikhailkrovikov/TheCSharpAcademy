@@ -11,6 +11,12 @@ namespace Coding.Tracker.Commands
         public override void Execute()
         {
             var list = service.ReadAllData();
+            if (list.Count == 0)
+            {
+                SpectreConsoleUI.PrintMessage("No sessions to delete", "yellow");
+                Console.ReadKey(true);
+                return;
+            }
             SpectreConsoleUI.PrintTable(list);
 
             var choice = AnsiConsole.Prompt(

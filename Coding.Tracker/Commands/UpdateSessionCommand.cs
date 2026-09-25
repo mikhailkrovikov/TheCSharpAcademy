@@ -10,6 +10,13 @@ namespace Coding.Tracker.Commands
 
         public override void Execute()
         {
+            var data = service.ReadAllData();
+            if (data.Count == 0)
+            {
+                SpectreConsoleUI.PrintMessage("No sessions to delete", "yellow");
+                Console.ReadKey(true);
+                return;
+            }
             var reader = new ViewDataCommand(service);
             reader.ExecuteWithoutExit();
             var id = ValidateNumeric(AnsiConsole.Ask<string>("Enter numeric [blue]id[/] of session for update:"));

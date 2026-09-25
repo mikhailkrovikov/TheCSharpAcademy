@@ -38,5 +38,24 @@ namespace Coding.Tracker
         {
             AnsiConsole.Clear();
         }
+
+        public static List<int> PrintChoices(List<CodeSession> sessions)
+        {
+            var multiPrompt = new MultiSelectionPrompt<string>()
+                .Title("Choose session")
+                .NotRequired()
+                .InstructionsText("[grey](Press [blue]<space>[/] to toggle, [green]<enter>[/] to confirm)[/]");
+
+            foreach (var session in sessions)
+            {
+                multiPrompt.AddChoice(session.ToString());
+            }
+
+            var choices = AnsiConsole.Prompt(multiPrompt);
+            return sessions
+                .Where(s => choices.Contains(s.ToString()))
+                .Select(s => s.Id)
+                .ToList();
+        }
     }
 }
