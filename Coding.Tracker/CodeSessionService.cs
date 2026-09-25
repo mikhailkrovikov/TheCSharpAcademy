@@ -9,7 +9,7 @@ namespace Coding.Tracker
         private readonly string connectionString = "DataSource=coding_tracker.db";
         private readonly string tableName = "sessions";
 
-        public void CreateDatabase()
+        public bool CreateDatabase()
         {
             using (IDbConnection db = new SqliteConnection(connectionString))
             {
@@ -20,44 +20,36 @@ namespace Coding.Tracker
                                 EndTime TEXT,
                                 Duration TEXT
                             )";
-                db.Execute(query);
+                return db.Execute(query) > 0;
             };
         }
 
-        public void Create(CodeSession session)
+        public bool Create(CodeSession session)
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
-            {
-                var query = $"INSERT INTO {tableName}(StartTime, EndTime, Duration) VALUES(@StartTime, @EndTime, @Duration)";
-                db.Execute(query, session);
-            }
+            using IDbConnection db = new SqliteConnection(connectionString);
+            var query = $"INSERT INTO {tableName}(StartTime, EndTime, Duration) VALUES(@StartTime, @EndTime, @Duration)";
+            return db.Execute(query, session)  > 0;
         }
 
         public List<CodeSession> ReadAllData()
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
-            {
-                var query = $"SELECT * FROM {tableName}";
-                return db.Query<CodeSession>(query).ToList();
-            }
+            using IDbConnection db = new SqliteConnection(connectionString);
+            var query = $"SELECT * FROM {tableName}";
+            return db.Query<CodeSession>(query).ToList();
         }
 
-        public void Update(CodeSession session)
+        public bool Update(CodeSession session)
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
-            {
-                var query = $"UPDATE {tableName} SET StartTime=@StartTime, EndTime=@EndTime, Duration=@Duration";
-                db.Execute(query, session);
-            }
+            using IDbConnection db = new SqliteConnection(connectionString);
+            var query = $"UPDATE {tableName} SET StartTime=@StartTime, EndTime=@EndTime, Duration=@Duration";
+            return  db.Execute(query, session) > 0;
         }
 
-        public void Delete(int id)
+        public bool Delete(int id)
         {
-            using(IDbConnection db = new SqliteConnection(connectionString))
-            {
-                var query = $"DELETE FROM {tableName} WHERE Id=@Id";
-                db.Execute(query, new { id });
-            }
+            using IDbConnection db = new SqliteConnection(connectionString);
+            var query = $"DELETE FROM {tableName} WHERE Id=@id";
+            return db.Execute(query, new { id }) > 0;
         }
     }
 }

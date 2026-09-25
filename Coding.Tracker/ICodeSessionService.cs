@@ -2,10 +2,10 @@
 {
     public interface ICodeSessionService
     {
-        void CreateDatabase();
-        void Create(CodeSession session);
+        bool CreateDatabase();
+        bool Create(CodeSession session);
         List<CodeSession> ReadAllData();
-        void Update(CodeSession session);
-        void Delete(int id);
+        bool Update(CodeSession session);
+        bool Delete(int id);
     }
 }
