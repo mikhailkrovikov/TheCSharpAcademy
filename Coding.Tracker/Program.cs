@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Extensions.Configuration;
+using Spectre.Console;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace Coding.Tracker
@@ -8,8 +10,22 @@ namespace Coding.Tracker
         private static CodeSessionService service;
         static void Main(string[] args)
         {
+            try
+            {
+                var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
 
-            service = new CodeSessionService();
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
+                service = new CodeSessionService(connectionString);
+            }
+            catch
+            {
+                SpectreConsoleUI.PrintMessage("Unable to load configuration");
+                return;
+            }
+         
             service.CreateDatabase();
 
             while (true)
@@ -17,7 +33,7 @@ namespace Coding.Tracker
                 try
                 {
                     ResetConsole();
-                    var choice = GetUserAction(Console.ReadLine());
+                    var choice = GetUserAction();
 
                     if (choice == UserAction.CreateSession)
                     {
@@ -32,7 +48,7 @@ namespace Coding.Tracker
                     if (choice == UserAction.ReadSessions)
                     {
                         PrintAllData();
-                        Console.WriteLine("\nPress any key to return to Menu");
+                        SpectreConsoleUI.PrintMessage("\nPress any key to return to Menu");
                         Console.ReadKey();
                     }
                     if (choice == UserAction.UpdateSession)
@@ -46,17 +62,17 @@ namespace Coding.Tracker
                 }
                 catch (ArgumentException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    SpectreConsoleUI.PrintMessage($"{ex.Message}", "red");
                     Console.ReadKey();
                 }
                 catch (FormatException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    SpectreConsoleUI.PrintMessage($"{ex.Message}", "red");
                     Console.ReadKey();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    SpectreConsoleUI.PrintMessage($"{ex.Message}", "red");
                     Console.ReadKey();
                 }
             }
@@ -64,8 +80,8 @@ namespace Coding.Tracker
 
         private static void ResetConsole()
         {
-            Console.Clear();
-            SpectreConsoleUI.PrintMessage("Choose action S C R U D ");
+            SpectreConsoleUI.Clear();
+            //SpectreConsoleUI.PrintMessage("Choose action S C R U D ");
         }
 
 
@@ -96,19 +112,34 @@ namespace Coding.Tracker
             else throw new FormatException($"Wrong format of value: {input}! Should be numeric");
         }
 
-        private static UserAction GetUserAction(string input)
+        private static UserAction GetUserAction()
+        {
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("What [blue]action[/] would you like?")
+                .AddChoices(
+                    "Start new session",
+                    "Add new session",
+                    "View sessions",
+                    "Update session",
+                    "Delete session")
+                );
+            return MapString(choice);
+        }
+
+        private static UserAction MapString(string input)
         {
             switch (input)
             {
-                case "S":
+                case "Start new session":
                     return UserAction.StartSession;
-                case "C":
+                case "Add new session":
                     return UserAction.CreateSession;
-                case "R":
+                case "View sessions":
                     return UserAction.ReadSessions;
-                case "U":
+                case "Update session":
                     return UserAction.UpdateSession;
-                case "D":
+                case "Delete session":
                     return UserAction.DeleteSession;
                 default: throw new ArgumentException("This type of action is not supported");
             }
@@ -121,19 +152,20 @@ namespace Coding.Tracker
             Console.ReadKey();
 
             var startTime = DateTime.Now;
-            Console.Clear();
+            SpectreConsoleUI.Clear();
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var lastSecond = 0d;
+            var lastSecond = 0;
             while (!Console.KeyAvailable)
             {
-                var currentSecond = stopwatch.Elapsed.TotalSeconds;
+                var currentSecond = (int)stopwatch.Elapsed.TotalSeconds;
                 if (currentSecond != lastSecond)
                 {
+                    SpectreConsoleUI.Clear();
                     lastSecond = currentSecond;
                     var elapsed = stopwatch.Elapsed;
-                    SpectreConsoleUI.PrintMessage($"\rElapsed: {(int)elapsed.TotalHours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}. Press any key to stop");
+                    SpectreConsoleUI.PrintMessage($"Elapsed: {(int)elapsed.TotalHours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}. Press any key to stop");
                 }
             }
             Console.ReadKey(true);
@@ -193,7 +225,7 @@ namespace Coding.Tracker
         private static void UpdateSession()
         {
             PrintAllData();
-            SpectreConsoleUI.PrintMessage("Enter [blue]id[/] of session for Update");
+            SpectreConsoleUI.PrintMessage("Enter numeric [blue]id[/] of session for Update");
             var id = ValidateNumeric(Console.ReadLine());
             var session = service.ReadAllData().FirstOrDefault(s => s.Id == id);
             if (session == null)
@@ -231,7 +263,7 @@ namespace Coding.Tracker
         private static void DeleteSession()
         {
             PrintAllData();
-            SpectreConsoleUI.PrintMessage("Enter [blue]id[/] of session for delete");
+            SpectreConsoleUI.PrintMessage("Enter numeric [blue]id[/] of session for delete");
             var id = ValidateNumeric(Console.ReadLine());
             var session = service.ReadAllData().FirstOrDefault(s => s.Id == id);
             if (session == null)

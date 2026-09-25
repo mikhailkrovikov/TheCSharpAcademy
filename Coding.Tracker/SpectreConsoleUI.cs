@@ -28,9 +28,15 @@ namespace Coding.Tracker
         {
             AnsiConsole.MarkupLine($"[{color}] {message}[/]");
         }
+
         public static void PrintMessage(string message)
         {
             PrintMessage(message, "white");
+        }
+
+        public static void Clear()
+        {
+            AnsiConsole.Clear();
         }
     }
 }
