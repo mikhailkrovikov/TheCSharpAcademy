@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using NUnit.Framework;
 
 namespace Coding.Tracker
 {
+    [TestFixture]
     public class CodeTracker_should
     {
     }
