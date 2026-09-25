@@ -19,23 +19,24 @@ namespace Coding.Tracker.Commands
             }
             SpectreConsoleUI.PrintTable(list);
 
-            var choice = AnsiConsole.Prompt(
+
+            while (true)
+            {
+                var choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                 .Title("What [blue]action[/] would you like?")
                 .AddChoices(
                     "Exit",
-                    "Order duration descending", 
+                    "Order duration descending",
                     "Order duration ascending"));
 
-            if (choice == "Exit")
-                return;
-            else if (choice== "Order duration descending")
-                OrderByDesc();
-            else if (choice == "Order duration ascending")
-                OrderByAsc();
-
-            SpectreConsoleUI.PrintMessage("\nPress any key to return to Menu");
-            Console.ReadKey();
+                if (choice == "Exit")
+                    break;
+                else if (choice == "Order duration descending")
+                    OrderByDesc();
+                else if (choice == "Order duration ascending")
+                    OrderByAsc();
+            }
         }
 
         public void ExecuteWithoutExit()
