@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Coding.Tracker.Commands;
+using Microsoft.Extensions.Configuration;
 using Spectre.Console;
-using System.Diagnostics;
-using System.Globalization;
 
 namespace Coding.Tracker
 {
@@ -10,65 +9,15 @@ namespace Coding.Tracker
         private static CodeSessionService service;
         static void Main(string[] args)
         {
-            try
-            {
-                var configuration = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false)
-                .Build();
-
-                var connectionString = configuration.GetConnectionString("DefaultConnection");
-                service = new CodeSessionService(connectionString);
-            }
-            catch
-            {
-                SpectreConsoleUI.PrintMessage("Unable to load configuration");
-                return;
-            }
-         
+            if (!Configurate()) return;
             service.CreateDatabase();
-
             while (true)
             {
                 try
                 {
-                    ResetConsole();
+                    SpectreConsoleUI.Clear();
                     var choice = GetUserAction();
-
-                    if (choice == UserAction.CreateSession)
-                    {
-                        CreateSession();
-                    }
-
-                    if (choice == UserAction.StartSession)
-                    {
-                        StartSession();
-                    }
-
-                    if (choice == UserAction.ReadSessions)
-                    {
-                        PrintAllData();
-                        SpectreConsoleUI.PrintMessage("\nPress any key to return to Menu");
-                        Console.ReadKey();
-                    }
-                    if (choice == UserAction.UpdateSession)
-                    {
-                        UpdateSession();
-                    }
-                    if (choice == UserAction.DeleteSession)
-                    {
-                        DeleteSession();
-                    }
-                }
-                catch (ArgumentException ex)
-                {
-                    SpectreConsoleUI.PrintMessage($"{ex.Message}", "red");
-                    Console.ReadKey();
-                }
-                catch (FormatException ex)
-                {
-                    SpectreConsoleUI.PrintMessage($"{ex.Message}", "red");
-                    Console.ReadKey();
+                    Execute(choice);
                 }
                 catch (Exception ex)
                 {
@@ -76,40 +25,6 @@ namespace Coding.Tracker
                     Console.ReadKey();
                 }
             }
-        }
-
-        private static void ResetConsole()
-        {
-            SpectreConsoleUI.Clear();
-            //SpectreConsoleUI.PrintMessage("Choose action S C R U D ");
-        }
-
-
-
-        private static DateTime ValidateDateTime(string input)
-        {
-            var valid = DateTime.TryParseExact(
-                input,
-                "dd-MM-yy HH:mm:ss",
-                new CultureInfo("en-US"),
-                DateTimeStyles.None, out DateTime result);
-
-            if (valid)
-            {
-                return result;
-            }
-            else throw new FormatException($"Wrong format of value: {input}! Should be dd-MM-yy HH:mm:ss");
-
-        }
-
-        private static int ValidateNumeric(string input)
-        {
-            var valid = int.TryParse(input, out int result);
-            if (valid)
-            {
-                return result;
-            }
-            else throw new FormatException($"Wrong format of value: {input}! Should be numeric");
         }
 
         private static UserAction GetUserAction()
@@ -144,141 +59,46 @@ namespace Coding.Tracker
                 default: throw new ArgumentException("This type of action is not supported");
             }
         }
-
-
-        private static void StartSession()
+        
+        private static void Execute(UserAction action)
         {
-            SpectreConsoleUI.PrintMessage("To start session press any key...");
-            Console.ReadKey();
+            Command command = default;
+            if (action == UserAction.CreateSession)
+                command = new CreateSessionCommand(service);
 
-            var startTime = DateTime.Now;
-            SpectreConsoleUI.Clear();
+            else if (action == UserAction.StartSession)
+                command = new StartSessionCommand(service);
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            var lastSecond = 0;
-            while (!Console.KeyAvailable)
-            {
-                var currentSecond = (int)stopwatch.Elapsed.TotalSeconds;
-                if (currentSecond != lastSecond)
-                {
-                    SpectreConsoleUI.Clear();
-                    lastSecond = currentSecond;
-                    var elapsed = stopwatch.Elapsed;
-                    SpectreConsoleUI.PrintMessage($"Elapsed: {(int)elapsed.TotalHours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}. Press any key to stop");
-                }
-            }
-            Console.ReadKey(true);
-            SpectreConsoleUI.PrintMessage(string.Empty);
-            stopwatch.Stop();
+            else if (action == UserAction.ReadSessions)
+                command = new ViewDataCommand(service);
 
-            var endTime = DateTime.Now;
-            var codeSession = new CodeSession
-            {
-                StartTime = startTime.ToString("dd-MM-yy HH:mm:ss"),
-                EndTime = endTime.ToString("dd-MM-yy HH:mm:ss"),
-                Duration = TimeOnly.FromTimeSpan(endTime - startTime).ToString("HH:mm:ss")
-            };
+            else if (action == UserAction.UpdateSession)
+                command = new UpdateSessionCommand(service);
 
-            if (!service.Create(codeSession))
-            {
-                throw new ArgumentException("Error occures when adding to database");
-            }
-            SpectreConsoleUI.PrintMessage("Session was succesfully created. Press any key to return to Menu", "green");
-            Console.ReadKey();
+            else if (action == UserAction.DeleteSession)
+                command = new DeleteSessionCommand(service);
+
+            else throw new ArgumentException("Invalid command");
+            command.Execute();
         }
 
-        private static void CreateSession()
+        private static bool Configurate()
         {
-            SpectreConsoleUI.PrintMessage("Enter starttime of session in dd-MM-yy HH:mm:ss format");
-            var startTime = ValidateDateTime(Console.ReadLine());
-
-            SpectreConsoleUI.PrintMessage("Enter endTime of session in dd-MM-yy HH:mm:ss format");
-            var endTime = ValidateDateTime(Console.ReadLine());
-
-            if (endTime <= startTime)
+            try
             {
-                throw new ArgumentException($"StartTime {startTime} cannot be greater then EndTime {endTime}");
+                var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
+                service = new CodeSessionService(connectionString);
+                return true;
             }
-
-            var session = new CodeSession
+            catch
             {
-                StartTime = startTime.ToString("dd-MM-yy HH:mm:ss"),
-                EndTime = endTime.ToString("dd-MM-yy HH:mm:ss"),
-                Duration = TimeOnly.FromTimeSpan(endTime - startTime).ToString("HH:mm:ss")
-            };
-
-            if (!service.Create(session))
-            {
-                throw new ArgumentException("Error occures when adding to database");
-            }
-            SpectreConsoleUI.PrintMessage("Session was succesfully created. Press any key to return to Menu", "green");
-            Console.ReadKey();
-        }
-
-        private static void PrintAllData()
-        {
-            var list = service.ReadAllData();
-            SpectreConsoleUI.PrintTable(list);
-        }
-
-        private static void UpdateSession()
-        {
-            PrintAllData();
-            SpectreConsoleUI.PrintMessage("Enter numeric [blue]id[/] of session for Update");
-            var id = ValidateNumeric(Console.ReadLine());
-            var session = service.ReadAllData().FirstOrDefault(s => s.Id == id);
-            if (session == null)
-            {
-                SpectreConsoleUI.PrintMessage($"Session with {id} not found", "yellow");
-                Console.ReadKey();
-            }
-            else
-            {
-                SpectreConsoleUI.PrintMessage("Enter starttime of session in dd-MM-yy HH:mm:ss format");
-                var startTime = ValidateDateTime(Console.ReadLine());
-
-                SpectreConsoleUI.PrintMessage("Enter endTime of session in dd-MM-yy HH:mm:ss format");
-                var endTime = ValidateDateTime(Console.ReadLine());
-
-                if (endTime <= startTime)
-                {
-                    throw new ArgumentException($"StartTime {startTime} cannot be greater then EndTime {endTime}");
-                }
-
-                session.StartTime = startTime.ToString("dd-MM-yy HH:mm:ss");
-                session.EndTime = endTime.ToString("dd-MM-yy HH:mm:ss");
-                session.Duration = TimeOnly.FromTimeSpan(endTime - startTime).ToString("HH:mm:ss");
-
-                if (!service.Update(session))
-                {
-                    throw new ArgumentException("Error occures when updating of database");
-                }
-
-                SpectreConsoleUI.PrintMessage("Session was succesfully updated. Press any key to return to Menu", "green");
-                Console.ReadKey();
-            }
-        }
-
-        private static void DeleteSession()
-        {
-            PrintAllData();
-            SpectreConsoleUI.PrintMessage("Enter numeric [blue]id[/] of session for delete");
-            var id = ValidateNumeric(Console.ReadLine());
-            var session = service.ReadAllData().FirstOrDefault(s => s.Id == id);
-            if (session == null)
-            {
-                SpectreConsoleUI.PrintMessage($"Session with {id} not found", "yellow");
-                Console.ReadKey();
-            }
-            else
-            {
-                if (!service.Delete(id))
-                {
-                    throw new ArgumentException("Error occures when delete form database");
-                }
-                SpectreConsoleUI.PrintMessage("Session was succesfully deleted. Press any key to return to Menu", "green");
-                Console.ReadKey();
+                SpectreConsoleUI.PrintMessage("Unable to load configuration");
+                return false;
             }
         }
     }
