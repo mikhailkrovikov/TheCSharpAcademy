@@ -5,7 +5,7 @@ namespace Coding.Tracker
     public static class Program
     {
         private static CodeSessionService service;
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             if (!Configurate()) return;
             service.CreateDatabase();
