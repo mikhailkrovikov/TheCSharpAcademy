@@ -31,6 +31,7 @@ namespace Coding.Tracker.Commands
             SpectreConsoleUI.PrintMessage("\nPress any key to return to Menu");
             Console.ReadKey();
         }
+
         public void ExecuteWithoutExit()
         {
             var list = service.ReadAllData();
@@ -43,6 +44,7 @@ namespace Coding.Tracker.Commands
             var ordered = service.ReadAllData().OrderByDescending(c => c.Duration).ToList();
             SpectreConsoleUI.PrintTable(ordered);
         }
+
         public void OrderByAsc()
         {
             SpectreConsoleUI.Clear();

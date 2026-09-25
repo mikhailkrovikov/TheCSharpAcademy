@@ -6,7 +6,8 @@
         CreateSession,
         ReadSessions,
         UpdateSession,
-        DeleteSession
+        DeleteSession,
+        Exit,
 
     }
 }
