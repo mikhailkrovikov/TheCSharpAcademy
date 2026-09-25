@@ -15,7 +15,7 @@ namespace Coding.Tracker
 
         public bool CreateDatabase()
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
+            return Execute(db =>
             {
                 var query = $@"CREATE TABLE IF NOT EXISTS {table} 
                             (
@@ -25,14 +25,16 @@ namespace Coding.Tracker
                                 Duration TEXT
                             )";
                 return db.Execute(query) > 0;
-            };
+            });
         }
 
         public bool Create(CodeSession session)
         {
-            using IDbConnection db = new SqliteConnection(connectionString);
-            var query = $"INSERT INTO {table}(StartTime, EndTime, Duration) VALUES(@StartTime, @EndTime, @Duration)";
-            return db.Execute(query, session)  > 0;
+            return Execute(db =>
+            {
+                var query = $"INSERT INTO {table}(StartTime, EndTime, Duration) VALUES(@StartTime, @EndTime, @Duration)";
+                return db.Execute(query, session) > 0;
+            });
         }
 
         public List<CodeSession> ReadAllData()
@@ -44,16 +46,26 @@ namespace Coding.Tracker
 
         public bool Update(CodeSession session)
         {
-            using IDbConnection db = new SqliteConnection(connectionString);
-            var query = $"UPDATE {table} SET StartTime=@StartTime, EndTime=@EndTime, Duration=@Duration";
-            return  db.Execute(query, session) > 0;
+            return Execute(db =>
+            {
+                var query = $"UPDATE {table} SET StartTime=@StartTime, EndTime=@EndTime, Duration=@Duration";
+                return db.Execute(query, session) > 0;
+            });
         }
 
         public bool Delete(int id)
         {
+            return Execute(db =>
+            {
+                var query = $"DELETE FROM {table} WHERE Id=@id";
+                return db.Execute(query, new { id }) > 0;
+            });
+        }
+
+        private bool Execute(Func<IDbConnection, bool> action)
+        {
             using IDbConnection db = new SqliteConnection(connectionString);
-            var query = $"DELETE FROM {table} WHERE Id=@id";
-            return db.Execute(query, new { id }) > 0;
+            return action(db);
         }
     }
 }
