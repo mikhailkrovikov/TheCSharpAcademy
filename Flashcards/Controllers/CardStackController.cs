@@ -28,7 +28,8 @@ namespace Flashcards.Controllers
 
         public IEnumerable<CardStackDTO> ReadCardStacks()
         {
-            foreach (var cardStack in repository.ReadCardStacks())
+            var stacks = repository.ReadCardStacks();
+            foreach (var cardStack in stacks)
                 yield return new CardStackDTO { Id = cardStack.Id, Name = cardStack.Name };
         }
 
