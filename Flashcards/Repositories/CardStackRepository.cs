@@ -1,15 +1,16 @@
 ﻿using Dapper;
+using Flashcards.Entities;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace Flashcards
+namespace Flashcards.Repositories
 {
-    public class StackCardService
+    public class CardStackRepository
     {
         private readonly string connectionString;
         private readonly string table = "stacks";
 
-        public StackCardService(string connectionString)
+        public CardStackRepository(string connectionString)
         {
             this.connectionString = connectionString;
         }

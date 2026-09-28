@@ -1,24 +1,24 @@
 ﻿using Dapper;
+using Flashcards.Entities;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace Flashcards
+namespace Flashcards.Repositories
 {
-    public class FlashcardService
+    public class FlashcardRepository
     {
         private readonly string connectionString;
         private readonly string table = "cards";
 
-        public FlashcardService(string connectionString)
+        public FlashcardRepository(string connectionString)
         {
             this.connectionString = connectionString;
         }
 
-        public void CreateFlashcard(FlashcardEntity flashcard, CardStackEntity cardStack)
+        public void CreateFlashcard(FlashcardEntity flashcard)
         {
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                flashcard.CardStackId = cardStack.Id;
                 var query = $"INSERT INTO {table}(Front, Back, CardStackId) VALUES(@Front, @Back, @CardStackId);";
                 db.Execute(query, flashcard);
             }
@@ -32,11 +32,11 @@ namespace Flashcards
             }
         }
 
-        public List<FlashcardEntity> ReadFlashcards()
+        public List<FlashcardEntity> ReadFlashcards(int stackId)
         {
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                return db.Query<FlashcardEntity>($"SELECT * FROM {table}").ToList();
+                return db.Query<FlashcardEntity>($"SELECT * FROM {table} WHERE CardStackId=@stackId").ToList();
             }
         }
 
