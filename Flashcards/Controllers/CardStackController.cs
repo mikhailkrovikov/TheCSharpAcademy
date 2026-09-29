@@ -1,10 +1,7 @@
 ﻿using Flashcards.DTOs;
 using Flashcards.Entities;
 using Flashcards.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace Flashcards.Controllers
 {
@@ -12,9 +9,16 @@ namespace Flashcards.Controllers
     {
         private readonly CardStackRepository repository;
 
-        public CardStackController(CardStackRepository repository)
+        public CardStackController()
         {
-            this.repository = repository;
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            repository = new(connectionString);
+            repository.CreateDatabase();
         }
 
         public void CreateCardStack(CardStackDTO cardStack)
@@ -31,6 +35,11 @@ namespace Flashcards.Controllers
             var stacks = repository.ReadCardStacks();
             foreach (var cardStack in stacks)
                 yield return new CardStackDTO { Id = cardStack.Id, Name = cardStack.Name };
+        }
+
+        public void DeleteCardStack(int stackId)
+        {
+            repository.DeleteCardStack(stackId);
         }
 
     }

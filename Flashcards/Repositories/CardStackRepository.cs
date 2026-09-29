@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Flashcards.Entities;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using System.Data;
 
 namespace Flashcards.Repositories
@@ -14,19 +15,38 @@ namespace Flashcards.Repositories
         {
             this.connectionString = connectionString;
         }
-
-        public void CreateCardStack(CardStackEntity cardStack)
+        public bool CreateDatabase()
         {
-            using (IDbConnection db = new SqlConnection(connectionString))
+            return Execute(db =>
+            {
+                var query = $@"CREATE TABLE IF NOT EXISTS {table} 
+                            (
+                                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                Name TEXT
+                            )";
+                return db.Execute(query) > 0;
+            });
+        }
+        private bool Execute(Func<IDbConnection, bool> action)
+        {
+            using (IDbConnection db = new SqliteConnection(connectionString))
+            {
+                return action(db);
+            }
+        }
+
+        public bool CreateCardStack(CardStackEntity cardStack)
+        {
+            return Execute(db =>
             {
                 var query = $"INSERT INTO {table}(Name) VALUES(@Name);";
-                db.Execute(query, cardStack);
-            }
+                return db.Execute(query, cardStack) > 0;
+            });
         }
 
         public CardStackEntity? GetCardStack(int id)
         {
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqliteConnection(connectionString))
             {
                 return db.Query<CardStackEntity>($"SELECT * FROM {table} WHERE Id=@id", new { id }).FirstOrDefault();
             }
@@ -34,28 +54,28 @@ namespace Flashcards.Repositories
 
         public List<CardStackEntity> ReadCardStacks()
         {
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqliteConnection(connectionString))
             {
                 return db.Query<CardStackEntity>($"SELECT * FROM {table}").ToList();
             }
         }
 
-        public void UpdateCardStack(CardStackEntity cardStack)
+        public bool UpdateCardStack(CardStackEntity cardStack)
         {
-            using(IDbConnection db = new SqlConnection(connectionString))
+            return Execute(db =>
             {
                 var query = $"UPDATE {table} SET Name=@Name WHERE Id=@Id";
-                db.Execute(query, cardStack);
-            }
+                return db.Execute(query, cardStack) > 0;
+            });
         }
 
-        public void DeleteCardStack(int id)
+        public bool DeleteCardStack(int id)
         {
-            using (IDbConnection db = new SqlConnection(connectionString))
+            return Execute(db =>
             {
-                var query = $"DELETE FROM {table} WHERE Id=@Id";
-                db.Execute(query, new { id });
-            }
+                var query = $"DELETE FROM {table} WHERE Id=@id";
+                return db.Execute(query, new { id }) > 0;
+            });
         }
     }
 }

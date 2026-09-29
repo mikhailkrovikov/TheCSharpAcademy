@@ -1,6 +1,7 @@
 ﻿using Flashcards.DTOs;
 using Flashcards.Entities;
 using Flashcards.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace Flashcards.Controllers
 {
@@ -8,9 +9,16 @@ namespace Flashcards.Controllers
     {
         private readonly FlashcardRepository repository;
 
-        public FlashcardController(FlashcardRepository repository)
+        public FlashcardController()
         {
-            this.repository = repository;
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            repository = new(connectionString);
+            repository.CreateDatabase();
         }
 
         public void CreateFlashCard(CreateFlashcardDTO request)
@@ -43,6 +51,11 @@ namespace Flashcards.Controllers
             var entities = repository.ReadFlashcards(stackId);
             foreach (var item in entities)
                 yield return new GetFlashcardDTO { Front = item.Front, Back = item.Back };
+        }
+
+        public void DeleteFlashcard(int id)
+        {
+            repository.DeleteFlashcard(id);
         }
     }
 }
