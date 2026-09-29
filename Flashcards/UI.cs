@@ -62,27 +62,27 @@ namespace Flashcards
                 .ToList();
         }
 
-        public static List<int> PrintFlashcardChoices(List<CreateFlashcardDTO> flashcards)
+        public static List<int> PrintFlashcardChoices(List<GetFlashcardDTO> flashcards)
         {
             if (flashcards.Count == 0)
             {
                 AnsiConsole.MarkupLine("No flashcards yet;");
-                return null;
+                return new List<int>();
             }
 
-            var multiPrompt = new MultiSelectionPrompt<string>()
+            var multiPrompt = new MultiSelectionPrompt<GetFlashcardDTO>()
                 .Title("Choose flashcards")
+                .UseConverter(f => Markup.Escape(f.Front + " - " + f.Back))
                 .NotRequired()
                 .InstructionsText("[grey](Press [blue]<space>[/] to toggle, [green]<enter>[/] to confirm)[/]");
 
             foreach (var flashcard in flashcards)
             {
-                multiPrompt.AddChoice(flashcard.ToString());
+                multiPrompt.AddChoice(flashcard);
             }
 
             var choices = AnsiConsole.Prompt(multiPrompt);
-            return flashcards
-                .Where(s => choices.Contains(s.ToString()))
+            return choices
                 .Select(s => s.Id)
                 .ToList();
         }

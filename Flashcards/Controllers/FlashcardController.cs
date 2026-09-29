@@ -41,6 +41,7 @@ namespace Flashcards.Controllers
             }
             return new GetFlashcardDTO
             {
+                Id = entity.Id,
                 Front = entity.Front,
                 Back = entity.Back,
             };
@@ -50,7 +51,7 @@ namespace Flashcards.Controllers
         {
             var entities = repository.ReadFlashcards(stackId);
             foreach (var item in entities)
-                yield return new GetFlashcardDTO { Front = item.Front, Back = item.Back };
+                yield return new GetFlashcardDTO { Id = item.Id, Front = item.Front, Back = item.Back };
         }
 
         public void DeleteFlashcard(int id)
