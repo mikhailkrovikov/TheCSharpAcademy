@@ -86,7 +86,9 @@ namespace Flashcards.Menus
         {
             var answer = AnsiConsole.Ask<string>($"{flashcard.Front}: print a translation: ");
             if (answer.Trim().Equals("E", StringComparison.OrdinalIgnoreCase))
+            {
                 return false;
+            }
 
             if (answer.Equals(flashcard.Back))
             {

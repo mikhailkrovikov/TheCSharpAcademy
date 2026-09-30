@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Flashcards.Entities;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace Flashcards.Repositories
@@ -14,21 +14,26 @@ namespace Flashcards.Repositories
         {
             this.connectionString = connectionString;
         }
-        public bool CreateDatabase()
+
+        public bool CreateTable()
         {
             return Execute(db =>
             {
-                var query = $@"CREATE TABLE IF NOT EXISTS {table} 
-                            (
-                                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                Name TEXT
-                            )";
-                return db.Execute(query) > 0;
+                var query =
+                @$"IF NOT EXISTS 
+                    (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{table}') AND type in (N'U'))
+                    CREATE TABLE {table}
+                    (
+                        Id INT IDENTITY(1, 1) PRIMARY KEY,
+                        Name VARCHAR(50) NOT NULL UNIQUE
+                    );";
+                return db.Execute(query) != 0;
             });
         }
+
         private bool Execute(Func<IDbConnection, bool> action)
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(connectionString))
             {
                 return action(db);
             }
@@ -38,24 +43,31 @@ namespace Flashcards.Repositories
         {
             return Execute(db =>
             {
-                var query = $"INSERT INTO {table}(Name) VALUES(@Name);";
+                var query = 
+                @$"INSERT INTO {table}(Name) 
+                    VALUES(@Name);";
                 return db.Execute(query, cardStack) > 0;
             });
         }
 
         public CardStackEntity? GetCardStack(int id)
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(connectionString))
             {
-                return db.Query<CardStackEntity>($"SELECT * FROM {table} WHERE Id=@id", new { id }).FirstOrDefault();
+                return db.Query<CardStackEntity>(
+                    @$"SELECT * FROM {table} 
+                        WHERE Id=@id", new { id })
+                    .FirstOrDefault();
             }
         }
 
         public List<CardStackEntity> ReadCardStacks()
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(connectionString))
             {
-                return db.Query<CardStackEntity>($"SELECT * FROM {table}").ToList();
+                return db.Query<CardStackEntity>(
+                    @$"SELECT * FROM {table}")
+                    .ToList();
             }
         }
 
@@ -63,7 +75,9 @@ namespace Flashcards.Repositories
         {
             return Execute(db =>
             {
-                var query = $"UPDATE {table} SET Name=@Name WHERE Id=@Id";
+                var query =
+                @$"UPDATE {table} 
+                    SET Name=@Name WHERE Id=@Id";
                 return db.Execute(query, cardStack) > 0;
             });
         }
@@ -72,7 +86,9 @@ namespace Flashcards.Repositories
         {
             return Execute(db =>
             {
-                var query = $"DELETE FROM {table} WHERE Id=@id";
+                var query =
+                @$"DELETE FROM {table}
+                    WHERE Id=@id";
                 return db.Execute(query, new { id }) > 0;
             });
         }

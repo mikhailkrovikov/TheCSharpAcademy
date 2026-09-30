@@ -1,8 +1,7 @@
-﻿namespace Flashcards.Entities
+﻿namespace Flashcards.DTOs
 {
-    public class StudySession
+    public class CreateStudySessionDTO
     {
-        public int Id { get; set; }
         public int CardStackId { get; set; }
         public DateTime Time { get; set; }
         public int Score { get; set; }

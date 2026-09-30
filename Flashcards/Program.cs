@@ -9,6 +9,7 @@ namespace Flashcards
         {
             var cardStackController = new CardStackController();
             var flashcardController = new FlashcardController();
+            var studySessionController = new StudySessionController();
 
             var studyMenu = new StudyMenu(cardStackController, flashcardController);
             var flashcardMenu = new FlashcardMenu(flashcardController);

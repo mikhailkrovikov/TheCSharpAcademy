@@ -18,7 +18,7 @@ namespace Flashcards.Controllers
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             repository = new(connectionString);
-            repository.CreateDatabase();
+            repository.CreateTable();
         }
 
         public void CreateFlashCard(CreateFlashcardDTO request)

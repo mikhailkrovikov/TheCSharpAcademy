@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Flashcards.Entities;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace Flashcards.Repositories
@@ -14,25 +14,28 @@ namespace Flashcards.Repositories
         {
             this.connectionString = connectionString;
         }
-        public bool CreateDatabase()
+        public bool CreateTable()
         {
             return Execute(db =>
             {
-                var query = $@"CREATE TABLE IF NOT EXISTS {table} 
-                            (
-                                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                Front TEXT,
-                                Back TEXT,
-                                CardStackId INTEGER,
-                                FOREIGN KEY (CardStackId) REFERENCES stacks (Id) ON DELETE CASCADE
-                            )";
-                return db.Execute(query) > 0;
+                var query =
+                @$"IF NOT EXISTS 
+                    (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{table}') AND type in (N'U'))
+                    CREATE TABLE {table}
+                    (
+                         Id INT IDENTITY(1, 1) PRIMARY KEY,
+                         Front VARCHAR(100) NOT NULL,
+                         Back VARCHAR(100) NOT NULL,
+                         CardStackId INT,
+                         FOREIGN KEY (CardStackId) REFERENCES stacks (Id) ON DELETE CASCADE
+                    );";
+                return db.Execute(query) != 0;
             });
         }
 
         private bool Execute(Func<IDbConnection, bool> action)
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(connectionString))
             {
                 return action(db);
             }
@@ -42,14 +45,16 @@ namespace Flashcards.Repositories
         {
             return Execute(db =>
             {
-                var query = $"INSERT INTO {table}(Front, Back, CardStackId) VALUES(@Front, @Back, @CardStackId);";
+                var query = 
+                @$"INSERT INTO {table}(Front, Back, CardStackId) 
+                    VALUES(@Front, @Back, @CardStackId);";
                 return db.Execute(query, flashcard) > 0;
             });
         }
 
         public FlashcardEntity? GetFlashcard(int id)
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(connectionString))
             {
                 return db.Query<FlashcardEntity>($"SELECT * FROM {table} WHERE Id=@id", new { id }).FirstOrDefault();
             }
@@ -57,7 +62,7 @@ namespace Flashcards.Repositories
 
         public List<FlashcardEntity> ReadFlashcards(int stackId)
         {
-            using (IDbConnection db = new SqliteConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(connectionString))
             {
                 return db.Query<FlashcardEntity>($"SELECT * FROM {table} WHERE CardStackId=@stackId", new { stackId }).ToList();
             }
