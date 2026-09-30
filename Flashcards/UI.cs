@@ -1,13 +1,14 @@
 ﻿using Flashcards.DTOs;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Flashcards
 {
-    public class UI
+    public static class UI
     {
+        public static void PrintMessage(string message)
+        {
+            AnsiConsole.MarkupLine(message);
+        }
 
         public static string GetActions(List<string> actions)
         {
@@ -23,23 +24,28 @@ namespace Flashcards
             var table = new Table()
                 .AddColumn("Name");
             foreach (var stack in stacks)
-                table.AddRow($"{stack.Name}");     
+                table.AddRow($"{stack.Name}");
             AnsiConsole.Write(table);
         }
 
         public static void PrintFlashcardTable(List<GetFlashcardDTO> flashcards)
         {
+            var number = 1;
             var table = new Table()
+                .AddColumn("Id")
                 .AddColumn("Front")
                 .AddColumn("Back");
             foreach (var flashcard in flashcards)
-                table.AddRow(flashcard.Front, flashcard.Back);
+            {
+                table.AddRow(number.ToString(), flashcard.Front, flashcard.Back);
+                number++;
+            }
             AnsiConsole.Write(table);
         }
 
         public static List<int> PrintStackChoices(List<CardStackDTO> stacks)
         {
-            if(stacks.Count == 0) 
+            if (stacks.Count == 0)
             {
                 AnsiConsole.MarkupLine("No stacks yet;");
                 return null;

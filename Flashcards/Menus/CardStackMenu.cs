@@ -3,12 +3,12 @@ using Flashcards.DTOs;
 
 namespace Flashcards.Menus
 {
-    public class StackMenu
+    public class CardStackMenu
     {
         private readonly CardStackController cardStackController;
         private readonly FlashcardMenu flashcardMenu;
 
-        public StackMenu(CardStackController cardStackController, FlashcardMenu flashcardMenu)
+        public CardStackMenu(CardStackController cardStackController, FlashcardMenu flashcardMenu)
         {
             this.cardStackController = cardStackController;
             this.flashcardMenu = flashcardMenu;

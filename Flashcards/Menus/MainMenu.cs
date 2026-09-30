@@ -2,11 +2,13 @@ namespace Flashcards.Menus
 {
     public class MainMenu
     {
-        private readonly StackMenu stackMenu;
+        private readonly CardStackMenu stackMenu;
+        private readonly StudyMenu studyMenu;
 
-        public MainMenu(StackMenu stackMenu)
+        public MainMenu(CardStackMenu stackMenu, StudyMenu studyMenu)
         {
             this.stackMenu = stackMenu;
+            this.studyMenu = studyMenu;
         }
 
         public void Run()
@@ -19,6 +21,9 @@ namespace Flashcards.Menus
                     "Manage stacks",
                     "Exit"
                 });
+
+                if (result == "Study")
+                    studyMenu.Run();
 
                 if (result == "Manage stacks")
                     stackMenu.Run();

@@ -42,7 +42,9 @@ namespace Flashcards.Menus
         private void ViewFlashcards(int stackId)
         {
             var flashCards = flashcardController.GetFlashcards(stackId).ToList();
-            UI.PrintFlashcardTable(flashCards);
+            if (flashCards.Count == 0)
+                UI.PrintMessage("No flashcards");
+            else UI.PrintFlashcardTable(flashCards);
         }
 
         private void RemoveFlashcards(int stackId)
@@ -50,9 +52,7 @@ namespace Flashcards.Menus
             var flashCards = flashcardController.GetFlashcards(stackId).ToList();
             var selectedIds = UI.PrintFlashcardChoices(flashCards);
             foreach (var id in selectedIds)
-            {
-                flashcardController.DeleteFlashcard(id);
-            }
+                flashcardController.DeleteFlashcard(id);       
         }
 
         private void AddFlashcard(int stackId)
