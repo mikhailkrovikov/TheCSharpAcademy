@@ -20,7 +20,14 @@ namespace Flashcards
         {
             score = 0;
             var studySession = new CreateStudySessionDTO();
-            var flashcards = flashcardController.GetFlashcards(cardStack.Id);
+            var flashcards = flashcardController.GetFlashcards(cardStack.Id).ToList();
+            if (flashcards.Count == 0)
+            {
+                UI.PrintMessage("This stack has no flashcards. Add flashcards before studying");
+                UI.PrintMessage("Press Enter to return to the study menu");
+                Console.ReadLine();
+                return;
+            }
             UI.PrintMessage("To stop studying, enter E instead of an answer.");
             foreach (var flashcard in flashcards)
             {

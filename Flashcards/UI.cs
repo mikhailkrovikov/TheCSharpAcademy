@@ -18,6 +18,15 @@ namespace Flashcards
                 })).Trim();
         }
 
+        public static int AskNumber(string prompt, int min, int max)
+        {
+            return AnsiConsole.Prompt(new TextPrompt<int>(prompt)
+                .ValidationErrorMessage("Enter a whole number.")
+                .Validate(value => value >= min && value <= max
+                    ? ValidationResult.Success()
+                    : ValidationResult.Error($"Enter a number between {min} and {max}.")));
+        }
+
         public static void PrintMessage(string message)
         {
             AnsiConsole.WriteLine(message);
