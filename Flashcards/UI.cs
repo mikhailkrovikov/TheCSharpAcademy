@@ -7,7 +7,7 @@ namespace Flashcards
     {
         public static void PrintMessage(string message)
         {
-            AnsiConsole.MarkupLine(message);
+            AnsiConsole.WriteLine(message);
         }
 
         public static string GetActions(List<string> actions)
@@ -15,6 +15,7 @@ namespace Flashcards
             var str = AnsiConsole
                 .Prompt(new SelectionPrompt<string>()
                     .Title("Choose action")
+                    .UseConverter(action => Markup.Escape(action))
                     .AddChoices(actions));
             return str;
         }
@@ -24,7 +25,7 @@ namespace Flashcards
             var table = new Table()
                 .AddColumn("Name");
             foreach (var stack in stacks)
-                table.AddRow($"{stack.Name}");
+                table.AddRow(Markup.Escape(stack.Name));
             AnsiConsole.Write(table);
         }
 
@@ -37,7 +38,7 @@ namespace Flashcards
                 .AddColumn("Back");
             foreach (var flashcard in flashcards)
             {
-                table.AddRow(number.ToString(), flashcard.Front, flashcard.Back);
+                table.AddRow(number.ToString(), Markup.Escape(flashcard.Front), Markup.Escape(flashcard.Back));
                 number++;
             }
             AnsiConsole.Write(table);
@@ -53,6 +54,7 @@ namespace Flashcards
 
             var multiPrompt = new MultiSelectionPrompt<string>()
                 .Title("Choose stack")
+                .UseConverter(name => Markup.Escape(name))
                 .NotRequired()
                 .InstructionsText("[grey](Press [blue]<space>[/] to toggle, [green]<enter>[/] to confirm)[/]");
 

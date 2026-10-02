@@ -76,7 +76,7 @@ namespace Flashcards.Menus
 
             foreach (var session in sessions)
             {
-                table.AddRow(session.CardStackName, session.Time.ToString(), session.Score.ToString());
+                table.AddRow(Markup.Escape(session.CardStackName), session.Time.ToString(), session.Score.ToString());
             }
 
             AnsiConsole.Write(table);
@@ -107,7 +107,7 @@ namespace Flashcards.Menus
             foreach (var session in monthlySessions)
             {
                 table.AddRow(
-                    session.StackName,
+                    Markup.Escape(session.StackName),
                     session.January.ToString(),
                     session.February.ToString(),
                     session.March.ToString(),
@@ -145,7 +145,7 @@ namespace Flashcards.Menus
             foreach (var score in averageScores)
             {
                 table.AddRow(
-                    score.StackName,
+                    Markup.Escape(score.StackName),
                     score.SessionMonth?.ToString() ?? "—",
                     score.AverageScore?.ToString("F2") ?? "—");
             }

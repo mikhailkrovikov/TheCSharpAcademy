@@ -53,7 +53,7 @@ namespace Flashcards
 
         private bool StudyCard(GetFlashcardDTO flashcard)
         {
-            var answer = AnsiConsole.Ask<string>($"{flashcard.Front}: print a translation: ");
+            var answer = AnsiConsole.Ask<string>($"{Markup.Escape(flashcard.Front)}: print a translation: ");
             if (answer.Trim().Equals("E", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
