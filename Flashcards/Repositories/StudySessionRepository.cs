@@ -45,11 +45,21 @@ namespace Flashcards.Repositories
         {
             return Execute((db) =>
             {
-                var query = 
+                var query =
                 @$"INSERT INTO {table}(CardStackId, Time, Score) 
                     VALUES(@CardStackId, @Time, @Score);";
                 return db.Execute(query, session) > 0;
             });
+        }
+
+        public List<StudySessionEntity> ReadSessions()
+        {
+            using(IDbConnection db = new SqlConnection(connectionString))
+            {
+                var query =
+                    $@"SELECT * FROM {table};";
+                return db.Query<StudySessionEntity>(query).ToList();
+            }
         }
     }
 }

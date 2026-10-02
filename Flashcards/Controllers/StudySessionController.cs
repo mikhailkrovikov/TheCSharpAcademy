@@ -31,5 +31,22 @@ namespace Flashcards.Controllers
             };
             repository.CreateSession(entity);
         }
+
+        public List<GetStudySessionDTO> ReadSessions(List<CardStackDTO> cardStacks)
+        {
+            var sessions = repository.ReadSessions();
+            return sessions
+                .Join(
+                cardStacks,
+                session => session.CardStackId,
+                cardStack => cardStack.Id,
+                (session, cardStack) => new GetStudySessionDTO
+                {
+                    CardStackName = cardStack.Name,
+                    Time = session.Time,
+                    Score = session.Score
+                })
+                .ToList();
+        }
     }
 }
