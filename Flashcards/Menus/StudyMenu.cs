@@ -144,7 +144,10 @@ namespace Flashcards.Menus
                 .AddColumn("Average Score");
             foreach (var score in averageScores)
             {
-                table.AddRow(score.StackName, score.SessionMonth, score.AverageScore.ToString("F2"));
+                table.AddRow(
+                    score.StackName,
+                    score.SessionMonth?.ToString() ?? "—",
+                    score.AverageScore?.ToString("F2") ?? "—");
             }
             AnsiConsole.Write(table);
             Console.WriteLine("Press Enter to return to the study menu.");
