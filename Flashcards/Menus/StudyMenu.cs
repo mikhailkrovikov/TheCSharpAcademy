@@ -87,8 +87,6 @@ namespace Flashcards.Menus
         private void ViewMonthlyReport()
         {
             var year = UI.AskNumber("Enter the year (1-2100) for which to view the monthly report:", 1, 2100);
-            studySessionController.GetMonthlySessions(year);
-
             var table = new Table()
                 .AddColumn("Stackname")
                 .AddColumn("January")
