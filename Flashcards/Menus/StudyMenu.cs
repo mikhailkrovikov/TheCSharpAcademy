@@ -129,8 +129,10 @@ namespace Flashcards.Menus
 
         private void ViewAverageScores()
         {
+            var year = AnsiConsole.Ask<int>("Enter the year for which to view the average scores:");
             var month = AnsiConsole.Ask<int>("Enter the month (1-12) for which to view the average scores:");
-            var averageScores = studySessionController.GetAverageScores(month);
+   
+            var averageScores = studySessionController.GetAverageScores(month, year);
             if (averageScores.Count == 0)
             {
                 UI.PrintMessage("No average scores found for the specified month.");

@@ -102,7 +102,7 @@ namespace Flashcards.Repositories
             }
         }
 
-        public List<AverageScoreDTO> GetAverageScores(int month)
+        public List<AverageScoreDTO> GetAverageScores(int month, int year)
         {
             using (IDbConnection db = new SqlConnection(connectionString))
             {
@@ -114,8 +114,9 @@ namespace Flashcards.Repositories
                         LEFT JOIN sessions
                             ON sessions.CardStackId = stacks.Id
                             AND MONTH(sessions.Time) = @Month
+                            AND YEAR(sessions.Time) = @Year
                         GROUP BY stacks.Name, MONTH(sessions.Time);";
-                return db.Query<AverageScoreDTO>(query, new { Month = month }).ToList();
+                return db.Query<AverageScoreDTO>(query, new { Month = month, Year = year }).ToList();
             }
         }
     }

@@ -54,9 +54,9 @@ namespace Flashcards.Controllers
             return  repository.GetMonthlySessions(year);
         }
 
-        public List<AverageScoreDTO> GetAverageScores(int month)
+        public List<AverageScoreDTO> GetAverageScores(int month , int year)
         {
-            return repository.GetAverageScores(month);
+            return repository.GetAverageScores(month, year);
         }
     }
 }
