@@ -11,11 +11,13 @@ namespace Flashcards.Menus
     {
         private readonly CardStackController cardStackController;
         private readonly FlashcardController flashcardController;
+        private readonly StudySessionController studySessionController;
 
-        public StudyMenu(CardStackController cardStackController, FlashcardController flashcardController)
+        public StudyMenu(CardStackController cardStackController, FlashcardController flashcardController, StudySessionController studySessionController)
         {
             this.flashcardController = flashcardController;
             this.cardStackController = cardStackController;
+            this.studySessionController = studySessionController;
         }
 
         public void Run()
@@ -28,6 +30,9 @@ namespace Flashcards.Menus
                 var action = UI.GetActions(new List<string>
                 {
                     "Choose stack",
+                    "View study sessions",
+                    "View monthly report",
+                    "View average scores",
                     "Exit"
                 });
 
@@ -35,6 +40,12 @@ namespace Flashcards.Menus
                     return;
                 if (action == "Choose stack")
                     ManageStacks(data);
+                if (action == "View study sessions")
+                    ViewStudySessions(data);
+                if (action == "View monthly report")
+                    ViewMonthlyReport();
+                if (action == "View average scores")
+                    ViewAverageScores();
             }
 
         }
@@ -46,61 +57,96 @@ namespace Flashcards.Menus
             var list = data.Select(c => c.Name).ToList();
             var stackName = UI.GetActions(list);
             var stackOwner = data.First(c => c.Name == stackName);
-            var studySession = new StudySession(flashcardController);
+            var studySession = new StudySession(flashcardController, studySessionController);
             studySession.StartGame(stackOwner);
         }
-    }
 
-
-    public class StudySession
-    {
-        private readonly FlashcardController flashcardController;
-        private int score;
-
-        public StudySession(FlashcardController flashcardController)
+        private void ViewStudySessions(List<CardStackDTO> data)
         {
-            this.flashcardController = flashcardController;
-        }
-
-        public void StartGame(CardStackDTO cardStack)
-        {
-            score = 0;
-            var flashcards = flashcardController.GetFlashcards(cardStack.Id);
-            UI.PrintMessage("To stop studying, enter E instead of an answer.");
-            foreach (var flashcard in flashcards)
+            var sessions = studySessionController.ReadSessions(data);
+            if (sessions.Count == 0)
             {
-                if (!StudyCard(flashcard))
-                {
-                    UI.PrintMessage($"Study stopped: your score is {score}");
-                    return;
-                }
+                UI.PrintMessage("No study sessions found.");
+                return;
             }
-            UI.PrintMessage($"Flashcards ended: your score is {score}");
-            UI.PrintMessage("Press Enter to return to the study menu.");
+            var table = new Table()
+                .AddColumn("Card stack name")
+                .AddColumn("Time")
+                .AddColumn("Score");
+
+            foreach (var session in sessions)
+            {
+                table.AddRow(session.CardStackName, session.Time.ToString(), session.Score.ToString());
+            }
+
+            AnsiConsole.Write(table);
+            Console.WriteLine("Press Enter to return to the study menu.");
             Console.ReadLine();
-            Console.Clear();
         }
 
-
-        private bool StudyCard(GetFlashcardDTO flashcard)
+        private void ViewMonthlyReport()
         {
-            var answer = AnsiConsole.Ask<string>($"{flashcard.Front}: print a translation: ");
-            if (answer.Trim().Equals("E", StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
+            var year = AnsiConsole.Ask<int>("Enter the year for which to view the monthly report:");
+            studySessionController.GetMonthlySessions(year);
 
-            if (answer.Equals(flashcard.Back))
+            var table = new Table()
+                .AddColumn("Stackname")
+                .AddColumn("January")
+                .AddColumn("February")
+                .AddColumn("March")
+                .AddColumn("April")
+                .AddColumn("May")
+                .AddColumn("June")
+                .AddColumn("July")
+                .AddColumn("August")
+                .AddColumn("September")
+                .AddColumn("October")
+                .AddColumn("November")
+                .AddColumn("December");
+            var monthlySessions = studySessionController.GetMonthlySessions(year);
+            foreach (var session in monthlySessions)
             {
-                score++;
-                UI.PrintMessage($"Correct, score is {score}");
+                table.AddRow(
+                    session.StackName,
+                    session.January.ToString(),
+                    session.February.ToString(),
+                    session.March.ToString(),
+                    session.April.ToString(),
+                    session.May.ToString(),
+                    session.June.ToString(),
+                    session.July.ToString(),
+                    session.August.ToString(),
+                    session.September.ToString(),
+                    session.October.ToString(),
+                    session.November.ToString(),
+                    session.December.ToString()
+                );
             }
-            else
-            {
-                UI.PrintMessage($"Incorrect, answer is {flashcard.Back}, score is {score}");
-            }
-            return true;
+            AnsiConsole.Write(table);
+            Console.WriteLine("Press Enter to return to the study menu.");
+            Console.ReadLine();
         }
 
+        private void ViewAverageScores()
+        {
+            var month = AnsiConsole.Ask<int>("Enter the month (1-12) for which to view the average scores:");
+            var averageScores = studySessionController.GetAverageScores(month);
+            if (averageScores.Count == 0)
+            {
+                UI.PrintMessage("No average scores found for the specified month.");
+                return;
+            }
+            var table = new Table()
+                .AddColumn("Stackname")
+                .AddColumn("Month")
+                .AddColumn("Average Score");
+            foreach (var score in averageScores)
+            {
+                table.AddRow(score.StackName, score.SessionMonth, score.AverageScore.ToString("F2"));
+            }
+            AnsiConsole.Write(table);
+            Console.WriteLine("Press Enter to return to the study menu.");
+            Console.ReadLine();
+        }
     }
 }

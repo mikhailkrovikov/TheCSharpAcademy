@@ -48,5 +48,15 @@ namespace Flashcards.Controllers
                 })
                 .ToList();
         }
+
+        public List<MonthlySessionDTO> GetMonthlySessions(int year)
+        {
+            return  repository.GetMonthlySessions(year);
+        }
+
+        public List<AverageScoreDTO> GetAverageScores(int month)
+        {
+            return repository.GetAverageScores(month);
+        }
     }
 }
