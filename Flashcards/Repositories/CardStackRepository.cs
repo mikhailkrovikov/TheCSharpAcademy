@@ -41,13 +41,20 @@ namespace Flashcards.Repositories
 
         public bool CreateCardStack(CardStackEntity cardStack)
         {
-            return Execute(db =>
+            try
             {
-                var query = 
-                @$"INSERT INTO {table}(Name) 
-                    VALUES(@Name);";
-                return db.Execute(query, cardStack) > 0;
-            });
+                return Execute(db =>
+                {
+                    var query =
+                    @$"INSERT INTO {table}(Name)
+                        VALUES(@Name);";
+                    return db.Execute(query, cardStack) > 0;
+                });
+            }
+            catch (SqlException exception) when (exception.Number is 2601 or 2627)
+            {
+                return false;
+            }
         }
 
         public CardStackEntity? GetCardStack(int id)

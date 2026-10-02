@@ -21,13 +21,13 @@ namespace Flashcards.Controllers
             repository.CreateTable();
         }
 
-        public void CreateCardStack(CardStackDTO cardStack)
+        public bool CreateCardStack(CardStackDTO cardStack)
         {
             var cardEntity = new CardStackEntity
             {
                 Name = cardStack.Name,
             };
-            repository.CreateCardStack(cardEntity);
+            return repository.CreateCardStack(cardEntity);
         }
 
         public IEnumerable<CardStackDTO> ReadCardStacks()

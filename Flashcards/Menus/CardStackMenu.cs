@@ -46,12 +46,15 @@ namespace Flashcards.Menus
 
         private void AddStack()
         {
-            var name = Console.ReadLine();
-            var card = new CardStackDTO
+            while (true)
             {
-                Name = name,
-            };
-            cardStackController.CreateCardStack(card);
+                var name = UI.AskText("Enter stack name:", 50);
+                var card = new CardStackDTO { Name = name };
+                if (cardStackController.CreateCardStack(card))
+                    return;
+
+                UI.PrintMessage("A stack with this name already exists. Enter a different name.");
+            }
         }
 
         private void RemoveStacks(List<CardStackDTO> data)

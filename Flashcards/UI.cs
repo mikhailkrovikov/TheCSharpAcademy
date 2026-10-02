@@ -5,6 +5,19 @@ namespace Flashcards
 {
     public static class UI
     {
+        public static string AskText(string prompt, int maxLength)
+        {
+            return AnsiConsole.Prompt(new TextPrompt<string>(prompt)
+                .Validate(text =>
+                {
+                    if (string.IsNullOrWhiteSpace(text))
+                        return ValidationResult.Error("Text cannot be empty or whitespace.");
+                    if (text.Trim().Length > maxLength)
+                        return ValidationResult.Error($"Text must contain at most {maxLength} characters.");
+                    return ValidationResult.Success();
+                })).Trim();
+        }
+
         public static void PrintMessage(string message)
         {
             AnsiConsole.WriteLine(message);

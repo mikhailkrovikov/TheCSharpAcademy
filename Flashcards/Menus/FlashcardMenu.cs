@@ -57,8 +57,8 @@ namespace Flashcards.Menus
 
         private void AddFlashcard(int stackId)
         {
-            var front = AnsiConsole.Ask<string>("Enter front [blue]text[/] of flashcard:");
-            var back = AnsiConsole.Ask<string>("Enter back [blue]text[/] of flashcard:");
+            var front = UI.AskText("Enter front [blue]text[/] of flashcard:", 100);
+            var back = UI.AskText("Enter back [blue]text[/] of flashcard:", 100);
             var flashcard = new CreateFlashcardDTO
             {
                 CardStackId = stackId,
