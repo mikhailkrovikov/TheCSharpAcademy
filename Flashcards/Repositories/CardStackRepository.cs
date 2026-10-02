@@ -25,7 +25,7 @@ namespace Flashcards.Repositories
                     CREATE TABLE {table}
                     (
                         Id INT IDENTITY(1, 1) PRIMARY KEY,
-                        Name VARCHAR(50) NOT NULL UNIQUE
+                        Name NVARCHAR(50) NOT NULL UNIQUE
                     );";
                 return db.Execute(query) != 0;
             });

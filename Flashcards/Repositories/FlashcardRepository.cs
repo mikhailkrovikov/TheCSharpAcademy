@@ -24,8 +24,8 @@ namespace Flashcards.Repositories
                     CREATE TABLE {table}
                     (
                          Id INT IDENTITY(1, 1) PRIMARY KEY,
-                         Front VARCHAR(100) NOT NULL,
-                         Back VARCHAR(100) NOT NULL,
+                         Front NVARCHAR(100) NOT NULL,
+                         Back NVARCHAR(100) NOT NULL,
                          CardStackId INT,
                          FOREIGN KEY (CardStackId) REFERENCES stacks (Id) ON DELETE CASCADE
                     );";
