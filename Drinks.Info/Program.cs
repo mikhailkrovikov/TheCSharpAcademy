@@ -14,7 +14,7 @@ internal class Program
 
         UI.PrintDrinkInfo(drink);
 
-        await DrinkAPI.GetImage(drink);
+        await DrinkAPI.GetSomeInfo(drink);
     }
 
 }

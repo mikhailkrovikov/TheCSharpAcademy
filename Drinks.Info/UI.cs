@@ -24,7 +24,8 @@ namespace Drinks.Info
 
         public static void PrintDrinkInfo(Drink drink)
         {
-            AnsiConsole.MarkupLine($"[green]Name:[/] {drink.StrDrink}");         
+            AnsiConsole.MarkupLine($"[green]Name:[/] {drink.StrDrink}"); 
+            AnsiConsole.MarkupLine($"[green]Instructions:[/] {drink.StrInstructions}");
         }
     }
 }
