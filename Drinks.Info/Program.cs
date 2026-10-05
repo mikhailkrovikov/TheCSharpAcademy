@@ -25,6 +25,7 @@ internal class Program
                 var ingridients = await DrinkAPI.GetIngridients(selectedDrink);
                 var measures = await DrinkAPI.GetMeasures(selectedDrink);
                 UI.PrintRecipe(ingridients, measures);
+                UI.PrintInstructions(drink.StrInstructions ?? "N/A");
                 UI.PrintDrinkImage(drink.StrDrinkThumb + "/small");
 
                 var navigation = UI.PrintNavigationChoise();

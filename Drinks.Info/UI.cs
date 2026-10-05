@@ -8,12 +8,49 @@ namespace Drinks.Info
         public const string BackToCategories = "Back to categories";
         public const string Exit = "Exit";
 
+        private const string Pink = "#ff8ad8";
+        private const string Purple = "#bb9af7";
+
+        private static void PrintScreen(string title)
+        {
+            if (!Console.IsOutputRedirected)
+            {
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+            AnsiConsole.Clear();
+            AnsiConsole.Write(new Rule($"[bold {Pink}]DRINKS.INFO[/]  [{Purple}]{Markup.Escape(title)}[/]")
+                .RuleStyle(Purple)
+                .LeftJustified());
+            AnsiConsole.WriteLine();
+        }
+
+        private static SelectionPrompt<string> CreatePrompt(string title)
+        {
+            return new SelectionPrompt<string>()
+                .Title($"[bold {Purple}]{title}[/]")
+                .HighlightStyle(new Style(new Color(255, 138, 216), Color.Black, Decoration.Bold))
+                .PageSize(10)
+                .WrapAround()
+                .MoreChoicesText($"[{Purple}]Use up/down to see more choices[/]");
+        }
+
+        private static Table CreateTable(string firstColumn, string secondColumn)
+        {
+            return new Table()
+                .Border(TableBorder.Rounded)
+                .BorderStyle(new Style(new Color(187, 154, 247)))
+                .AddColumn($"[bold {Pink}]{firstColumn}[/]")
+                .AddColumn($"[bold {Pink}]{secondColumn}[/]");
+        }
+
         public static string? PintCategoryChoise(List<string> categories)
         {
-            AnsiConsole.Clear();
+            PrintScreen("Categories");
+            AnsiConsole.MarkupLine($"[{Purple}]Up/Down to navigate • Enter to select[/]");
+            AnsiConsole.WriteLine();
             var choise = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select a [green]category[/]:")
+                CreatePrompt("Select a category:")
                     .AddChoices(categories)
                     .AddChoices(Exit));
             return choise == Exit ? null : choise;
@@ -21,10 +58,9 @@ namespace Drinks.Info
 
         public static Drink? PrintDrinkChoise(List<Drink> drinks)
         {
-            AnsiConsole.Clear();
+            PrintScreen("Drinks");
             var choise = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select a [purple]drink[/]:")
+                CreatePrompt("Select a drink:")
                     .AddChoices(drinks.Select(d => d.StrDrink).ToList())
                     .AddChoices(BackToCategories));
             if (choise == BackToCategories)
@@ -34,33 +70,39 @@ namespace Drinks.Info
 
         public static string PrintNavigationChoise()
         {
+            AnsiConsole.WriteLine();
             return AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Where would you like to go next?")
+                CreatePrompt("Where would you like to go next?")
                     .AddChoices(BackToDrinks, BackToCategories, Exit));
         }
 
         public static void PrintDrinkInfo(Drink drink)
         {
-            AnsiConsole.Clear();
-            var table = new Table()
-                .AddColumn("Property")
-                .AddColumn("Value")
-                .AddRow("Name", drink.StrDrink ?? "N/A")
-                .AddRow("Category", drink.StrCategory ?? "N/A")
-                .AddRow("Alcoholic", drink.StrAlcoholic ?? "N/A")
-                .AddRow("Tags", drink.StrTags ?? "N/A")
-                .AddRow("Instructions", drink.StrInstructions ?? "N/A")
-                .AddRow("Glass", drink.StrGlass ?? "N/A");
+            PrintScreen(drink.StrDrink ?? "Drink details");
+            var table = CreateTable("Property", "Value")
+                .AddRow("Name", Markup.Escape(drink.StrDrink ?? "N/A"))
+                .AddRow("Category", Markup.Escape(drink.StrCategory ?? "N/A"))
+                .AddRow("Alcoholic", Markup.Escape(drink.StrAlcoholic ?? "N/A"))
+                .AddRow("Tags", Markup.Escape(drink.StrTags ?? "N/A"))
+                .AddRow("Glass", Markup.Escape(drink.StrGlass ?? "N/A"));
             AnsiConsole.Write(table);
+        }
+
+        public static void PrintInstructions(string instructions)
+        {
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine($"[bold {Purple}]Instructions[/]");
+            AnsiConsole.MarkupLine(Markup.Escape(instructions));
         }
 
         public static void PrintRecipe(List<string> ingredients, List<string> measures)
         {
-            var table = new Table().AddColumn("Ingredient").AddColumn("Measure");
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine($"[bold {Purple}]Recipe[/]");
+            var table = CreateTable("Ingredient", "Measure");
             for (int i = 0; i < ingredients.Count; i++)  
                 if (!string.IsNullOrEmpty(ingredients[i]) || !string.IsNullOrEmpty(measures[i]))
-                    table.AddRow(ingredients[i] ?? "", measures[i] ?? ""); 
+                    table.AddRow(Markup.Escape(ingredients[i] ?? ""), Markup.Escape(measures[i] ?? ""));
             AnsiConsole.Write(table);
         }
         public static void PrintDrinkImage(string imageUrl)
