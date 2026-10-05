@@ -5,6 +5,6 @@ namespace Drinks.Info
     public record DrinksResponse
     {
         [JsonPropertyName("drinks")]
-        public List<Drink>? Drinks { get; set; }
+        public required List<Drink> Drinks { get; set; }
     }
 }

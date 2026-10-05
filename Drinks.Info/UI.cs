@@ -24,8 +24,32 @@ namespace Drinks.Info
 
         public static void PrintDrinkInfo(Drink drink)
         {
-            AnsiConsole.MarkupLine($"[green]Name:[/] {drink.StrDrink}"); 
-            AnsiConsole.MarkupLine($"[green]Instructions:[/] {drink.StrInstructions}");
+            var table = new Table()
+                .AddColumn("Property")
+                .AddColumn("Value")
+                .AddRow("Name", drink.StrDrink ?? "N/A")
+                .AddRow("Category", drink.StrCategory ?? "N/A")
+                .AddRow("Alcoholic", drink.StrAlcoholic ?? "N/A")
+                .AddRow("Tags", drink.StrTags ?? "N/A")
+                .AddRow("Instructions", drink.StrInstructions ?? "N/A")
+                .AddRow("Glass", drink.StrGlass ?? "N/A");
+            AnsiConsole.Write(table);
+        }
+
+        public static void PrintRecipe(List<string> ingredients, List<string> measures)
+        {
+            var table = new Table().AddColumn("Ingredient").AddColumn("Measure");
+            for (int i = 0; i < ingredients.Count; i++)  
+                if (!string.IsNullOrEmpty(ingredients[i]) || !string.IsNullOrEmpty(measures[i]))
+                    table.AddRow(ingredients[i] ?? "", measures[i] ?? ""); 
+            AnsiConsole.Write(table);
+        }
+        public static void PrintDrinkImage(string imageUrl)
+        {
+            using var client = new HttpClient();
+            using var imageSource = client.GetStreamAsync(imageUrl).Result;
+            var canvasImage = new CanvasImage(imageSource);
+            AnsiConsole.Write(canvasImage);
         }
     }
 }

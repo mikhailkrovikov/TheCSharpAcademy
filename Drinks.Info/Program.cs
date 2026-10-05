@@ -10,11 +10,17 @@ internal class Program
 
         List<Drink> drinks = await DrinkAPI.FilterByCategory(category);
 
-        Drink drink = UI.PrintDrinkChoise(drinks);
+        Drink selectedDrink = UI.PrintDrinkChoise(drinks);
 
+
+
+        //await DrinkAPI.GetSomeInfo(drink);
+        var drink = await DrinkAPI.GetDrinkInfo(selectedDrink);
         UI.PrintDrinkInfo(drink);
-
-        await DrinkAPI.GetSomeInfo(drink);
+        var ingridients = await DrinkAPI.GetIngridients(selectedDrink);
+        var measures = await DrinkAPI.GetMeasures(selectedDrink);
+        UI.PrintRecipe(ingridients, measures);
+        UI.PrintDrinkImage(drink.StrDrinkThumb);
     }
 
 }
