@@ -6,21 +6,34 @@ internal class Program
     {
         var categories = await DrinkAPI.GetCategories();
 
-        var category = UI.PintCategoryChoise(categories);
+        while (true)
+        {
+            var category = UI.PintCategoryChoise(categories);
+            if (category == null)
+                return;
 
-        List<Drink> drinks = await DrinkAPI.FilterByCategory(category);
+            List<Drink> drinks = await DrinkAPI.FilterByCategory(category);
 
-        Drink selectedDrink = UI.PrintDrinkChoise(drinks);
+            while (true)
+            {
+                var selectedDrink = UI.PrintDrinkChoise(drinks);
+                if (selectedDrink == null)
+                    break;
 
+                var drink = await DrinkAPI.GetDrinkInfo(selectedDrink);
+                UI.PrintDrinkInfo(drink);
+                var ingridients = await DrinkAPI.GetIngridients(selectedDrink);
+                var measures = await DrinkAPI.GetMeasures(selectedDrink);
+                UI.PrintRecipe(ingridients, measures);
+                UI.PrintDrinkImage(drink.StrDrinkThumb + "/small");
 
-
-        //await DrinkAPI.GetSomeInfo(drink);
-        var drink = await DrinkAPI.GetDrinkInfo(selectedDrink);
-        UI.PrintDrinkInfo(drink);
-        var ingridients = await DrinkAPI.GetIngridients(selectedDrink);
-        var measures = await DrinkAPI.GetMeasures(selectedDrink);
-        UI.PrintRecipe(ingridients, measures);
-        UI.PrintDrinkImage(drink.StrDrinkThumb);
+                var navigation = UI.PrintNavigationChoise();
+                if (navigation == UI.Exit)
+                    return;
+                if (navigation == UI.BackToCategories)
+                    break;
+            }
+        }
     }
 
 }

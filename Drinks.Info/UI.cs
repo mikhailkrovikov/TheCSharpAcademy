@@ -4,26 +4,45 @@ namespace Drinks.Info
 {
     public class UI
     {
-        public static string PintCategoryChoise(List<string> categories)
+        public const string BackToDrinks = "Back to drinks";
+        public const string BackToCategories = "Back to categories";
+        public const string Exit = "Exit";
+
+        public static string? PintCategoryChoise(List<string> categories)
         {
+            AnsiConsole.Clear();
             var choise = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("Select a [green]category[/]:")
-                    .AddChoices(categories));
-            return choise;
+                    .AddChoices(categories)
+                    .AddChoices(Exit));
+            return choise == Exit ? null : choise;
         }
 
-        public static Drink PrintDrinkChoise(List<Drink> drinks)
+        public static Drink? PrintDrinkChoise(List<Drink> drinks)
         {
+            AnsiConsole.Clear();
             var choise = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("Select a [purple]drink[/]:")
-                    .AddChoices(drinks.Select(d => d.StrDrink).ToList()));
+                    .AddChoices(drinks.Select(d => d.StrDrink).ToList())
+                    .AddChoices(BackToCategories));
+            if (choise == BackToCategories)
+                return null;
             return drinks.First(d => d.StrDrink == choise);
+        }
+
+        public static string PrintNavigationChoise()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Where would you like to go next?")
+                    .AddChoices(BackToDrinks, BackToCategories, Exit));
         }
 
         public static void PrintDrinkInfo(Drink drink)
         {
+            AnsiConsole.Clear();
             var table = new Table()
                 .AddColumn("Property")
                 .AddColumn("Value")
@@ -49,6 +68,7 @@ namespace Drinks.Info
             using var client = new HttpClient();
             using var imageSource = client.GetStreamAsync(imageUrl).Result;
             var canvasImage = new CanvasImage(imageSource);
+            canvasImage.MaxWidth(50);
             AnsiConsole.Write(canvasImage);
         }
     }
