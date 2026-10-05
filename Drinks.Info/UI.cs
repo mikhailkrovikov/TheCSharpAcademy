@@ -148,26 +148,5 @@ namespace Drinks.Info
             var updatedJson = System.Text.Json.JsonSerializer.Serialize(storage, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText("favourites.json", updatedJson);
         }
-
-        public static async Task RemoveFavouriteDrink(Drink drink)
-        {
-            var favourites = await LoadFavouriteDrinks();
-            favourites.RemoveWhere(saved => drink.IdDrink != 0
-                ? saved.IdDrink == drink.IdDrink
-                : saved.StrDrink == drink.StrDrink);
-            var storage = new FavouriteDrinkStorage { FavouriteDrinks = favourites };
-            var json = System.Text.Json.JsonSerializer.Serialize(storage,
-                new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync("favourites.json", json);
-        }
-
-        public static async Task<HashSet<Drink>> LoadFavouriteDrinks()
-        {
-            if (!File.Exists("favourites.json"))
-                return new HashSet<Drink>();
-            var json = await File.ReadAllTextAsync("favourites.json");
-            var storage = System.Text.Json.JsonSerializer.Deserialize<FavouriteDrinkStorage>(json);
-            return storage?.FavouriteDrinks ?? new HashSet<Drink>();
-        }
     }
 }
