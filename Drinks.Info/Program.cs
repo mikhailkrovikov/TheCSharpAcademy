@@ -1,4 +1,6 @@
-﻿namespace Drinks.Info;
+﻿using Spectre.Console;
+
+namespace Drinks.Info;
 
 internal class Program
 {
@@ -6,27 +8,35 @@ internal class Program
     {
         while (true)
         {
-            var option = UI.PrintMainMenu();
-            if (option == UI.Exit)
-                return;
-
-            if (option == UI.FavouriteDrinks)
+            try
             {
-                if (await FavouriteDrinkStorage.BrowseDrinks((await FavouriteDrinkStorage.LoadFavouriteDrinks()).ToList(), favourites: true))
+                var option = UI.PrintMainMenu();
+                if (option == UI.Exit)
                     return;
-                continue;
+
+                if (option == UI.FavouriteDrinks)
+                {
+                    if (await FavouriteDrinkStorage.BrowseDrinks((await FavouriteDrinkStorage.LoadFavouriteDrinks()).ToList(), favourites: true))
+                        return;
+                    continue;
+                }
+
+                var categories = await DrinkAPI.GetCategories();
+                while (true)
+                {
+                    var category = UI.PintCategoryChoise(categories);
+                    if (category == null)
+                        break;
+
+                    var drinks = await DrinkAPI.FilterByCategory(category);
+                    if (await FavouriteDrinkStorage.BrowseDrinks(drinks))
+                        return;
+                }
             }
-
-            var categories = await DrinkAPI.GetCategories();
-            while (true)
+            catch (Exception ex)
             {
-                var category = UI.PintCategoryChoise(categories);
-                if (category == null)
-                    break;
-
-                var drinks = await DrinkAPI.FilterByCategory(category);
-                if (await FavouriteDrinkStorage.BrowseDrinks(drinks))
-                    return;
+                AnsiConsole.MarkupLine($"Error: {ex.Message}[/]");
+                AnsiConsole.WriteLine();
             }
         }
     }
