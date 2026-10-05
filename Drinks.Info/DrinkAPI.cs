@@ -5,21 +5,6 @@ namespace Drinks.Info
 {
     public static class DrinkAPI
     {
-        //public static async Task GetSomeInfo(Drink drink)
-        //{
-        //    using var client = new HttpClient();
-        //    var drinks = await client.GetFromJsonAsync<DrinksResponse>($"https://www.thecocktaildb.com/api/json/v1/1/search.php?s={drink.StrDrink}");
-        //    foreach (var dr in drinks.Drinks)
-        //    {
-        //        if (dr == null)
-        //            continue;
-        //        //using var imageSource = await client.GetStreamAsync(dr.StrDrinkThumb + "/small");
-        //        //var canvasImage = new CanvasImage(imageSource);
-        //        //AnsiConsole.Write(canvasImage);
-        //        AnsiConsole.MarkupLine(dr.StrInstructions);
-        //    }
-        //}
-
         public static async Task<List<string?>?> GetIngridients(Drink drink)
         {
             return GetDrinkInfo(drink)?.Result?.RefreshIngridients();

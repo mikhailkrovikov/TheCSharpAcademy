@@ -6,7 +6,12 @@ namespace Drinks.Info
     {
         public const string BackToDrinks = "Back to drinks";
         public const string BackToCategories = "Back to categories";
-        public const string Exit = "Exit";
+        public const string AddToFavourites = "Add to favourites";
+        public const string RemoveFromFavourites = "Remove from favourites";
+        public const string FavouriteDrinks = "favour drinks";
+        public const string ViewCategories = "view categories";
+        public const string BackToMainMenu = "Back to main menu";
+        public const string Exit = "exit";
 
         private const string Pink = "#ff8ad8";
         private const string Purple = "#bb9af7";
@@ -44,6 +49,14 @@ namespace Drinks.Info
                 .AddColumn($"[bold {Pink}]{secondColumn}[/]");
         }
 
+        public static string PrintMainMenu()
+        {
+            PrintScreen("Main menu");
+            return AnsiConsole.Prompt(
+                CreatePrompt("Select an option:")
+                    .AddChoices(FavouriteDrinks, ViewCategories, Exit));
+        }
+
         public static string? PintCategoryChoise(List<string> categories)
         {
             PrintScreen("Categories");
@@ -52,28 +65,35 @@ namespace Drinks.Info
             var choise = AnsiConsole.Prompt(
                 CreatePrompt("Select a category:")
                     .AddChoices(categories)
-                    .AddChoices(Exit));
-            return choise == Exit ? null : choise;
+                    .AddChoices(BackToMainMenu));
+            return choise == BackToMainMenu ? null : choise;
         }
 
-        public static Drink? PrintDrinkChoise(List<Drink> drinks)
+        public static Drink? PrintDrinkChoise(List<Drink> drinks, bool favourites = false)
         {
-            PrintScreen("Drinks");
+            PrintScreen(favourites ? FavouriteDrinks : "Drinks");
+            if (favourites && drinks.Count == 0)
+            {
+                AnsiConsole.MarkupLine($"[{Purple}]No favourite drinks yet. Open a drink and select 'Add to favourites'.[/]");
+                AnsiConsole.WriteLine();
+            }
+            var back = favourites ? BackToMainMenu : BackToCategories;
             var choise = AnsiConsole.Prompt(
                 CreatePrompt("Select a drink:")
                     .AddChoices(drinks.Select(d => d.StrDrink).ToList())
-                    .AddChoices(BackToCategories));
-            if (choise == BackToCategories)
+                    .AddChoices(back));
+            if (choise == back)
                 return null;
             return drinks.First(d => d.StrDrink == choise);
         }
 
-        public static string PrintNavigationChoise()
+        public static string PrintNavigationChoise(bool favourites = false)
         {
             AnsiConsole.WriteLine();
             return AnsiConsole.Prompt(
                 CreatePrompt("Where would you like to go next?")
-                    .AddChoices(BackToDrinks, BackToCategories, Exit));
+                    .AddChoices(BackToDrinks, favourites ? BackToMainMenu : BackToCategories,
+                        favourites ? RemoveFromFavourites : AddToFavourites, Exit));
         }
 
         public static void PrintDrinkInfo(Drink drink)
@@ -112,6 +132,42 @@ namespace Drinks.Info
             var canvasImage = new CanvasImage(imageSource);
             canvasImage.MaxWidth(50);
             AnsiConsole.Write(canvasImage);
+        }
+
+        public static void SaveFavouriteDrink(Drink drink)
+        {
+            var storage = new FavouriteDrinkStorage();
+            if (File.Exists("favourites.json"))
+            {
+                var json = File.ReadAllText("favourites.json");
+                storage = System.Text.Json.JsonSerializer.Deserialize<FavouriteDrinkStorage>(json) ?? new FavouriteDrinkStorage();
+            }
+            if (storage.FavouriteDrinks == null)
+                storage.FavouriteDrinks = new HashSet<Drink>();
+            storage.FavouriteDrinks.Add(drink);
+            var updatedJson = System.Text.Json.JsonSerializer.Serialize(storage, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText("favourites.json", updatedJson);
+        }
+
+        public static async Task RemoveFavouriteDrink(Drink drink)
+        {
+            var favourites = await LoadFavouriteDrinks();
+            favourites.RemoveWhere(saved => drink.IdDrink != 0
+                ? saved.IdDrink == drink.IdDrink
+                : saved.StrDrink == drink.StrDrink);
+            var storage = new FavouriteDrinkStorage { FavouriteDrinks = favourites };
+            var json = System.Text.Json.JsonSerializer.Serialize(storage,
+                new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync("favourites.json", json);
+        }
+
+        public static async Task<HashSet<Drink>> LoadFavouriteDrinks()
+        {
+            if (!File.Exists("favourites.json"))
+                return new HashSet<Drink>();
+            var json = await File.ReadAllTextAsync("favourites.json");
+            var storage = System.Text.Json.JsonSerializer.Deserialize<FavouriteDrinkStorage>(json);
+            return storage?.FavouriteDrinks ?? new HashSet<Drink>();
         }
     }
 }
