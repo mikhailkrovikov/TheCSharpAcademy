@@ -12,7 +12,6 @@ namespace Drinks.Info
         public const string ViewCategories = "view categories";
         public const string BackToMainMenu = "Back to main menu";
         public const string Exit = "exit";
-
         private const string Pink = "#ff8ad8";
         private const string Purple = "#bb9af7";
 

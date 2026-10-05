@@ -12,7 +12,7 @@ internal class Program
 
             if (option == UI.FavouriteDrinks)
             {
-                if (await .BrowseDrinks((await FavouriteDrinkStorage.LoadFavouriteDrinks()).ToList(), favourites: true))
+                if (await FavouriteDrinkStorage.BrowseDrinks((await FavouriteDrinkStorage.LoadFavouriteDrinks()).ToList(), favourites: true))
                     return;
                 continue;
             }
