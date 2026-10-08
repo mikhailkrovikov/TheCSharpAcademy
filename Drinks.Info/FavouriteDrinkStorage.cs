@@ -34,10 +34,16 @@ public class FavouriteDrinkStorage
                 return false;
 
             var drink = await DrinkAPI.GetDrinkInfo(selectedDrink);
+            if (drink == null)
+            {
+                Console.WriteLine("Drink not found.");
+                continue;
+            }
+
             UI.PrintDrinkInfo(drink);
-            var ingridients = await DrinkAPI.GetIngridients(selectedDrink);
-            var measures = await DrinkAPI.GetMeasures(selectedDrink);
-            UI.PrintRecipe(ingridients, measures);
+            var ingredients = drink.RefreshIngridients();
+            var measures = drink.RefreshMeasures();
+            UI.PrintRecipe(ingredients, measures);
             UI.PrintInstructions(drink.StrInstructions ?? "N/A");
             UI.PrintDrinkImage(drink.StrDrinkThumb + "/small");
 
