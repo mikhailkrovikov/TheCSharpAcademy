@@ -29,30 +29,6 @@ namespace Phone.Book
             }
         }
 
-        public async Task<ContactEntity?> GetContactByNane(string name)
-        {
-            using (var context = new AppDbContext())
-            {
-                return await context.Contacts.FirstOrDefaultAsync(x => x.Name.Equals(name));
-            }
-        }
-
-        public async Task<ContactEntity?> GetContactByEmail(string email)
-        {
-            using (var context = new AppDbContext())
-            {
-                return await context.Contacts.FirstOrDefaultAsync(x => x.Email.Equals(email));
-            }
-        }
-
-        public async Task<ContactEntity?> GetContactByPhoneNumber(string phoneNumber)
-        {
-            using (var context = new AppDbContext())
-            {
-                return await context.Contacts.FirstOrDefaultAsync(x => x.PhoneNumber.Equals(phoneNumber));
-            }
-        }
-
         public async Task UpdateContact(int contactId, ContactEntity editedContact)
         {
             using (var context = new AppDbContext())

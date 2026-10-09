@@ -31,6 +31,24 @@ namespace Phone.Book
             builder
                 .HasIndex(c => c.PhoneNumber)
                 .IsUnique();
+
+            var item1 = new ContactEntity
+            {
+                Id = 1,
+                Name = "Mikrozaimy",
+                PhoneNumber = "+78005553535",
+                Email = "blya_budu@mail.ru"
+            };
+
+            var danek = new ContactEntity
+            {
+                Id = 2,
+                Name = "Danek",
+                PhoneNumber = "+79992281488",
+                Email = "karlik@mail.ru"
+            };
+
+            builder.HasData(item1, danek);
         }
     }
 }

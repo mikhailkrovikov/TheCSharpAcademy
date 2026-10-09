@@ -6,6 +6,11 @@ namespace Phone.Book
     {
         public DbSet<ContactEntity> Contacts { get; set; }
 
+        public AppDbContext()
+        {
+            Database.EnsureCreated();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=app.db");
