@@ -5,6 +5,7 @@
         static async Task Main(string[] args)
         {
             var repository = new ContactRepository();
+            var mailSender = new MailSender();
 
             while (true)
             {
@@ -12,6 +13,7 @@
                 Console.WriteLine("2. Add contact");
                 Console.WriteLine("3. Update contact");
                 Console.WriteLine("4. Delete contact");
+                Console.WriteLine("5. Send email");
                 Console.WriteLine("0. Exit");
                 Console.Write("Choose an option: ");
 
@@ -55,6 +57,33 @@
                             }
                             await repository.DeleteContact(deleteId);
                             Console.WriteLine("Contact deleted.");
+                            break;
+                        case "5":
+                            Console.Write("Contact id: ");
+                            if (!int.TryParse(Console.ReadLine(), out var recipientId))
+                            {
+                                Console.WriteLine("Invalid id.");
+                                break;
+                            }
+                            var recipient = await repository.GetContact(recipientId);
+                            if (recipient == null)
+                            {
+                                Console.WriteLine("Contact not found.");
+                                break;
+                            }
+                            Console.Write("Subject: ");
+                            var subject = Console.ReadLine() ?? "";
+                            Console.Write("Message: ");
+                            var body = Console.ReadLine() ?? "";
+                            try
+                            {
+                                await mailSender.Send(recipient.Email, recipient.Name, subject, body);
+                                Console.WriteLine("Email sent.");
+                            }
+                            catch (Exception exception)
+                            {
+                                Console.WriteLine($"Could not send email: {exception.Message}");
+                            }
                             break;
                         default:
                             Console.WriteLine("Invalid option.");
