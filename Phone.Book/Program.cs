@@ -29,7 +29,7 @@
                             var contacts = repository.GetAllContacts();
                             foreach (var contact in contacts)
                             {
-                                Console.WriteLine($"{contact.Id}. {contact.Name} | {contact.PhoneNumber} | {contact.Email}");
+                                Console.WriteLine($"{contact.Id}. {contact.Name} | {contact.PhoneNumber} | {contact.Email} | {contact.Group}");
                             }
                             break;
                         case "2":
@@ -100,11 +100,15 @@
                 Console.WriteLine("Invalid email.");
             }
 
+            Console.Write("Group (Family, Friends, Work, etc.): ");
+            var group = Console.ReadLine();
+
             return new ContactEntity
             {
                 Name = name ?? "",
                 PhoneNumber = phoneNumber,
-                Email = email
+                Email = email,
+                Group = group ?? ""
             };
         }
     }

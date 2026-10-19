@@ -25,6 +25,11 @@ namespace Phone.Book
                 .HasMaxLength(50);
 
             builder
+                .Property(c => c.Group)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder
                 .HasIndex(c => c.Email)
                 .IsUnique();
 
@@ -37,7 +42,8 @@ namespace Phone.Book
                 Id = 1,
                 Name = "Mikrozaimy",
                 PhoneNumber = "+78005553535",
-                Email = "blya_budu@mail.ru"
+                Email = "blya_budu@mail.ru",
+                Group = "Work"
             };
 
             var item2 = new ContactEntity
@@ -45,7 +51,8 @@ namespace Phone.Book
                 Id = 2,
                 Name = "Danek",
                 PhoneNumber = "+79992281488",
-                Email = "karlik@mail.ru"
+                Email = "karlik@mail.ru",
+                Group = "Friends"
             };
 
             builder.HasData(item1, item2);

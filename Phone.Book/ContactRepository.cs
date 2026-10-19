@@ -41,6 +41,7 @@ namespace Phone.Book
                 contact.Name = editedContact.Name;
                 contact.Email = editedContact.Email;
                 contact.PhoneNumber = editedContact.PhoneNumber;
+                contact.Group = editedContact.Group;
                 await context.SaveChangesAsync();
             }
         }
